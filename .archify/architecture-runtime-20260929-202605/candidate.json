@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "modelrec-new-api 运行时",
+    "subtitle": "一次模型调用如何进入进程、选路、扣费并转发到上游",
+    "locale": "zh-CN",
+    "output": ".archify/architecture-runtime-20260929-202605/runtime.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "git@github.com:LeonLee-study/modelrec-new-api.git",
+      "link_mode": "local-only",
+      "revision": "d681e22564ae1e93d53488d0e33a452af493398d"
+    }
+  },
+  "components": [
+    {
+      "id": "caller",
+      "type": "external",
+      "label": "调用方",
+      "sublabel": "浏览器与 API 客户端",
+      "pos": [16, 238],
+      "size": [180, 76]
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "嵌入前端",
+      "sublabel": "default 与 classic",
+      "pos": [266, 48],
+      "size": [180, 76],
+      "sources": [
+        { "path": "main.go", "line": 38, "end_line": 48, "label": "embed 两套前端" },
+        { "path": "router/web-router.go", "line": 24, "end_line": 32, "label": "托管静态页" }
+      ]
+    },
+    {
+      "id": "router",
+      "type": "backend",
+      "label": "Gin 路由",
+      "sublabel": "/v1、/api、页面",
+      "pos": [266, 238],
+      "size": [180, 76],
+      "sources": [
+        { "path": "main.go", "line": 193, "end_line": 199, "label": "挂上路由" },
+        { "path": "router/main.go", "line": 15, "end_line": 19, "label": "五组路由" },
+        { "path": "router/relay-router.go", "line": 69, "end_line": 97, "label": "/v1 聊天入口" }
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "令牌鉴权",
+      "sublabel": "TokenAuth",
+      "pos": [516, 238],
+      "size": [180, 76],
+      "tag": "sk-",
+      "sources": [
+        { "path": "router/relay-router.go", "line": 69, "end_line": 77, "label": "/v1 先鉴权" },
+        { "path": "middleware/auth.go", "line": 286, "end_line": 342, "label": "解析 sk- 与专用头" }
+      ]
+    },
+    {
+      "id": "distribute",
+      "type": "backend",
+      "label": "渠道分发",
+      "sublabel": "优先级后按权重",
+      "pos": [766, 238],
+      "size": [180, 76],
+      "sources": [
+        { "path": "middleware/distributor.go", "line": 32, "end_line": 80, "label": "Distribute" },
+        { "path": "middleware/distributor.go", "line": 443, "end_line": 480, "label": "写入渠道与 key" },
+        { "path": "service/channel_select.go", "line": 84, "end_line": 157, "label": "auto 分组" }
+      ]
+    },
+    {
+      "id": "cache",
+      "type": "backend",
+      "label": "渠道内存索引",
+      "sublabel": "分组到渠道",
+      "pos": [766, 48],
+      "size": [180, 76],
+      "sources": [
+        { "path": "model/channel_cache.go", "line": 26, "end_line": 64, "label": "从主库建索引" },
+        { "path": "model/channel_cache.go", "line": 108, "end_line": 154, "label": "按优先级选档" },
+        { "path": "main.go", "line": 74, "end_line": 97, "label": "缓存与周期同步" }
+      ]
+    },
+    {
+      "id": "relay",
+      "type": "backend",
+      "label": "转发循环",
+      "sublabel": "预扣、重试、退款",
+      "pos": [766, 458],
+      "size": [180, 76],
+      "sources": [
+        { "path": "controller/relay.go", "line": 68, "end_line": 168, "label": "估价并预扣" },
+        { "path": "controller/relay.go", "line": 191, "end_line": 236, "label": "失败则换渠道" }
+      ]
+    },
+    {
+      "id": "billing",
+      "type": "backend",
+      "label": "计费会话",
+      "sublabel": "钱包或订阅",
+      "pos": [516, 458],
+      "size": [180, 76],
+      "sources": [
+        { "path": "service/billing.go", "line": 17, "end_line": 26, "label": "预扣入口" },
+        { "path": "service/billing_session.go", "line": 341, "end_line": 417, "label": "资金来源选择" },
+        { "path": "service/text_quota.go", "line": 231, "end_line": 290, "label": "按量结算公式" }
+      ]
+    },
+    {
+      "id": "adaptor",
+      "type": "backend",
+      "label": "厂商适配器",
+      "sublabel": "协议转换",
+      "pos": [766, 678],
+      "size": [180, 76],
+      "sources": [
+        { "path": "relay/relay_adaptor.go", "line": 57, "end_line": 68, "label": "同步 GetAdaptor" },
+        { "path": "relay/relay_adaptor.go", "line": 141, "end_line": 177, "label": "异步 GetTaskAdaptor" },
+        { "path": "relay/compatible_handler.go", "line": 67, "end_line": 71, "label": "文本请求使用适配器" }
+      ]
+    },
+    {
+      "id": "upstream",
+      "type": "external",
+      "label": "上游模型",
+      "sublabel": "厂商 HTTP 接口",
+      "pos": [766, 888],
+      "size": [180, 76]
+    },
+    {
+      "id": "account",
+      "type": "backend",
+      "label": "短信登录",
+      "sublabel": "/api/user/login/sms",
+      "pos": [266, 458],
+      "size": [180, 76],
+      "sources": [
+        { "path": "router/api-router.go", "line": 74, "end_line": 75, "label": "短信路由" },
+        { "path": "controller/phone_auth.go", "line": 35, "end_line": 57, "label": "发码与校验编排" }
+      ]
+    },
+    {
+      "id": "modelhub",
+      "type": "external",
+      "label": "ModelHub",
+      "sublabel": "短信与验证码",
+      "pos": [16, 458],
+      "size": [180, 76],
+      "sources": [
+        { "path": "common/sms.go", "line": 38, "end_line": 44, "label": "调用 ModelHub" },
+        { "path": "common/sms.go", "line": 79, "end_line": 84, "label": "发送登录短信" }
+      ]
+    },
+    {
+      "id": "database",
+      "type": "database",
+      "label": "主数据库",
+      "sublabel": "SQLite / MySQL / PG",
+      "pos": [516, 678],
+      "size": [180, 76],
+      "sources": [
+        { "path": "model/main.go", "line": 53, "end_line": 55, "label": "主库与日志库" },
+        { "path": "model/user.go", "line": 926, "end_line": 938, "label": "扣减用户额度" },
+        { "path": "model/channel_cache.go", "line": 32, "end_line": 43, "label": "读出全部渠道" }
+      ]
+    },
+    {
+      "id": "taskrunner",
+      "type": "backend",
+      "label": "任务轮询",
+      "sublabel": "视频与异步任务",
+      "pos": [996, 678],
+      "size": [160, 76],
+      "sources": [
+        { "path": "main.go", "line": 124, "end_line": 141, "label": "注入适配器并启动" },
+        { "path": "service/task_polling.go", "line": 100, "end_line": 116, "label": "轮询未完成任务" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "new-api 进程",
+      "wraps": ["web", "router", "auth", "account", "distribute", "cache", "relay", "billing", "adaptor", "taskrunner"]
+    },
+    {
+      "kind": "security-group",
+      "label": "sk- 令牌门禁",
+      "wraps": ["auth"]
+    }
+  ],
+  "connections": [
+    { "id": "caller-to-router", "from": "caller", "to": "router", "label": "请求", "variant": "emphasis" },
+    { "id": "web-to-router", "from": "web", "to": "router", "label": "静态页" },
+    { "id": "router-to-auth", "from": "router", "to": "auth", "label": "/v1", "variant": "security" },
+    { "id": "auth-to-distribute", "from": "auth", "to": "distribute", "label": "通过", "variant": "emphasis" },
+    { "id": "distribute-to-cache", "from": "distribute", "to": "cache", "label": "读索引" },
+    { "id": "distribute-to-relay", "from": "distribute", "to": "relay", "label": "选中渠道", "variant": "emphasis" },
+    { "id": "relay-to-billing", "from": "relay", "to": "billing", "label": "预扣与结算" },
+    { "id": "billing-to-database", "from": "billing", "to": "database", "label": "额度" },
+    { "id": "relay-to-adaptor", "from": "relay", "to": "adaptor", "label": "转换", "variant": "emphasis" },
+    { "id": "adaptor-to-upstream", "from": "adaptor", "to": "upstream", "label": "上游 HTTP", "variant": "emphasis" },
+    { "id": "router-to-account", "from": "router", "to": "account", "label": "/api" },
+    { "id": "account-to-modelhub", "from": "account", "to": "modelhub", "label": "短信", "variant": "dashed" },
+    { "id": "task-to-adaptor", "from": "taskrunner", "to": "adaptor", "label": "轮询", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "同步调用",
+      "items": [
+        "主路径是 /v1 聊天、嵌入、图像和音频",
+        "RetryTimes 默认为 0，未调大时不会换渠道",
+        "重试降到下一优先级，同一档内按权重随机"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "额度",
+      "items": [
+        "1 美元对应 500000 额度",
+        "先扣令牌剩余，再扣钱包或订阅",
+        "失败退回预扣；异步任务必须全额预扣"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "进程外",
+      "items": [
+        "短信和阿里云验证码由 Go 调用 ModelHub",
+        "REDIS_CONN_STRING 会强制打开内存缓存",
+        "证据固定在 d681e225，未跟踪文件未计入"
+      ]
+    }
+  ]
+}
