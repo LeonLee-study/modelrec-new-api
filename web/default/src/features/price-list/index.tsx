@@ -16,21 +16,73 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useTranslation } from 'react-i18next'
+import { useCallback, useState } from 'react'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import {
+  PriceListContent,
+  PriceListFilterPanel,
+  PriceListHero,
+} from './components'
+import { FILTER_ALL } from './constants'
+import type { FilterGroupKey, PriceListFilterState } from './types'
+
+const INITIAL_FILTER_STATE: PriceListFilterState = {
+  billing: FILTER_ALL,
+  provider: FILTER_ALL,
+  model_type: FILTER_ALL,
+}
 
 export function PriceList() {
-  const { t } = useTranslation()
+  const [filters, setFilters] =
+    useState<PriceListFilterState>(INITIAL_FILTER_STATE)
+  const [search, setSearch] = useState('')
+
+  // Filter handlers are initialized with the correct shape; actual data-row
+  // filtering is a no-op until the pricing-table API lands and exposes the
+  // model list this state drives.
+  const handleGroupChange = useCallback(
+    (group: FilterGroupKey) => (value: string) => {
+      setFilters((prev) => ({ ...prev, [group]: value }))
+    },
+    []
+  )
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value)
+  }, [])
+
+  const handleClearFilters = useCallback(() => {
+    setFilters(INITIAL_FILTER_STATE)
+    setSearch('')
+  }, [])
+
+  const hasActiveFilters =
+    search.trim().length > 0 ||
+    filters.billing !== FILTER_ALL ||
+    filters.provider !== FILTER_ALL ||
+    filters.model_type !== FILTER_ALL
 
   return (
     <PublicLayout showMainContainer={false}>
-      <PageTransition className='relative mx-auto w-full max-w-[1280px] px-3 pt-0 pb-10 sm:px-6 sm:pt-4 sm:pb-12 xl:px-8'>
-        <header className='mx-auto mb-5 max-w-3xl pt-5 text-center sm:mb-10 sm:pt-10'>
-          <h1 className='text-[clamp(2rem,5.5vw,3.5rem)] leading-[1.15] font-bold tracking-tight'>
-            {t('Pricing')}
-          </h1>
-        </header>
+      <PageTransition>
+        <PriceListHero />
+
+        {/* 主内容分区底板 */}
+        <div className='w-full px-4 pt-8 pb-16'>
+          <PriceListFilterPanel
+            state={filters}
+            search={search}
+            resultCount={0}
+            onGroupChange={(group, value) => handleGroupChange(group)(value)}
+            onSearchChange={handleSearchChange}
+          />
+          <PriceListContent
+            search={search}
+            hasActiveFilters={hasActiveFilters}
+            onClearFilters={handleClearFilters}
+          />
+        </div>
       </PageTransition>
     </PublicLayout>
   )
