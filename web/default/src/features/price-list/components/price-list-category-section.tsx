@@ -17,17 +17,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { CategoryConfig } from '../constants'
 import type {
-  ImageRow,
-  PerSecondRow,
-  TextGenerationRow,
+  TokenPricingRow,
+  UnitPricingRow,
   VectorRow,
-  VoiceGenerationRow,
   WorldModelRow,
 } from '../types'
+
+type SortDirection = 'asc' | 'desc'
 
 // ----------------------------------------------------------------------------
 // Column definition
@@ -41,6 +42,8 @@ type ColDef<T> = {
   /** Tailwind class for the body cell. */
   cellClassName?: string
   render: (row: T) => ReactNode
+  sortable?: boolean
+  sortKey?: string
 }
 
 const NAME_COL = {
@@ -75,30 +78,18 @@ function sdCell(value: number, unit: string): ReactNode {
 // Per-category column definitions
 // ----------------------------------------------------------------------------
 
-/** 文本 / 多模态 — token 输入输出双价。 */
-const textGenCols: ColDef<TextGenerationRow>[] = [
+/** Token-based pricing — input/output USD + SD per 1M tokens. */
+const tokenCols: ColDef<TokenPricingRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
-  {
-    id: 'in_pr_USD',
-    headerKey: 'priceList.table.inPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.in_pr_USD}/1M`,
-  },
-  {
-    id: 'out_pr_USD',
-    headerKey: 'priceList.table.outPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.out_pr_USD}/1M`,
-  },
   {
     id: 'in_pr_SD',
     headerKey: 'priceList.table.inPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
+    sortable: true,
+    sortKey: 'in_pr_SD',
   },
   {
     id: 'out_pr_SD',
@@ -106,66 +97,98 @@ const textGenCols: ColDef<TextGenerationRow>[] = [
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.out_pr_SD, '燧点/1M'),
+    sortable: true,
+    sortKey: 'out_pr_SD',
+  },
+  {
+    id: 'in_pr_USD',
+    headerKey: 'priceList.table.inPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.in_pr_USD}/1M`,
+    sortable: true,
+    sortKey: 'in_pr_USD',
+  },
+  {
+    id: 'out_pr_USD',
+    headerKey: 'priceList.table.outPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.out_pr_USD}/1M`,
+    sortable: true,
+    sortKey: 'out_pr_USD',
   },
 ]
 
-/** 图片生成 / 图片识别 — 按张计价。 */
-const imageCols: ColDef<ImageRow>[] = [
+/** 图片生成 — 按张计价 (image_generate). */
+const imageGenCols: ColDef<UnitPricingRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'pc_pr_USD',
-    headerKey: 'priceList.table.pcPrUSD',
-    headerClassName: 'w-[30%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.pc_pr_USD}/张`,
-  },
-  {
-    id: 'pc_pr_SD',
+    id: 'unit_pr_SD',
     headerKey: 'priceList.table.pcPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.pc_pr_SD, '燧点/张'),
+    render: (r) => sdCell(r.unit_pr_SD, '燧点/张'),
+    sortable: true,
+    sortKey: 'unit_pr_SD',
+  },
+  {
+    id: 'unit_pr_USD',
+    headerKey: 'priceList.table.pcPrUSD',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.unit_pr_USD}/张`,
+    sortable: true,
+    sortKey: 'unit_pr_USD',
   },
 ]
 
-/** 视频生成 / 视频识别 / 语音识别 — 按秒计价。 */
-const perSecondCols: ColDef<PerSecondRow>[] = [
+/** 视频生成 — 按次/按秒单价 (video_generate). */
+const videoGenCols: ColDef<UnitPricingRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 's_pr_USD',
-    headerKey: 'priceList.table.sPrUSD',
-    headerClassName: 'w-[30%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.s_pr_USD}/s`,
-  },
-  {
-    id: 's_pr_SD',
+    id: 'unit_pr_SD',
     headerKey: 'priceList.table.sPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.s_pr_SD, '燧点/s'),
+    render: (r) => sdCell(r.unit_pr_SD, '燧点'),
+    sortable: true,
+    sortKey: 'unit_pr_SD',
+  },
+  {
+    id: 'unit_pr_USD',
+    headerKey: 'priceList.table.sPrUSD',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.unit_pr_USD}`,
+    sortable: true,
+    sortKey: 'unit_pr_USD',
   },
 ]
 
-/** 语音合成 — 按万字计价。 */
-const voiceGenCols: ColDef<VoiceGenerationRow>[] = [
+/** 视频识别 / 语音识别 — unit pricing (video_recognize, speech_recognize). */
+const unitPerSecondCols: ColDef<UnitPricingRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'w_pr_USD',
-    headerKey: 'priceList.table.wPrUSD',
-    headerClassName: 'w-[30%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.w_pr_USD}/万字`,
-  },
-  {
-    id: 'w_pr_SD',
-    headerKey: 'priceList.table.wPrSuidian',
+    id: 'unit_pr_SD',
+    headerKey: 'priceList.table.sPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.w_pr_SD, '燧点/万字'),
+    render: (r) => sdCell(r.unit_pr_SD, '燧点/s'),
+    sortable: true,
+    sortKey: 'unit_pr_SD',
+  },
+  {
+    id: 'unit_pr_USD',
+    headerKey: 'priceList.table.sPrUSD',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.unit_pr_USD}/s`,
+    sortable: true,
+    sortKey: 'unit_pr_USD',
   },
 ]
 
@@ -174,25 +197,13 @@ const worldModelCols: ColDef<WorldModelRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 't_in_pr_USD',
-    headerKey: 'priceList.table.tInPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.t_in_pr_USD}/次`,
-  },
-  {
     id: 't_in_pr_SD',
     headerKey: 'priceList.table.tInPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.t_in_pr_SD, '燧点/次'),
-  },
-  {
-    id: 's_out_pr_USD',
-    headerKey: 'priceList.table.sOutPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.s_out_pr_USD}/s`,
+    sortable: true,
+    sortKey: 't_in_pr_SD',
   },
   {
     id: 's_out_pr_SD',
@@ -200,6 +211,26 @@ const worldModelCols: ColDef<WorldModelRow>[] = [
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.s_out_pr_SD, '燧点/s'),
+    sortable: true,
+    sortKey: 's_out_pr_SD',
+  },
+  {
+    id: 't_in_pr_USD',
+    headerKey: 'priceList.table.tInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.t_in_pr_USD}/次`,
+    sortable: true,
+    sortKey: 't_in_pr_USD',
+  },
+  {
+    id: 's_out_pr_USD',
+    headerKey: 'priceList.table.sOutPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.s_out_pr_USD}/s`,
+    sortable: true,
+    sortKey: 's_out_pr_USD',
   },
 ]
 
@@ -208,25 +239,13 @@ const vectorCols: ColDef<VectorRow>[] = [
   { ...NAME_COL, render: (r) => r.model_name },
   { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'in_pr_USD',
-    headerKey: 'priceList.table.textInPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.in_pr_USD}/1M`,
-  },
-  {
     id: 'in_pr_SD',
     headerKey: 'priceList.table.textInPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
-  },
-  {
-    id: 'vec_in_pr_USD',
-    headerKey: 'priceList.table.vecInPrUSD',
-    headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: USD_CELL_CLASS,
-    render: (r) => `$${r.vec_in_pr_USD}/1M`,
+    sortable: true,
+    sortKey: 'in_pr_SD',
   },
   {
     id: 'vec_in_pr_SD',
@@ -234,20 +253,40 @@ const vectorCols: ColDef<VectorRow>[] = [
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
     render: (r) => sdCell(r.vec_in_pr_SD, '燧点/1M'),
+    sortable: true,
+    sortKey: 'vec_in_pr_SD',
+  },
+  {
+    id: 'in_pr_USD',
+    headerKey: 'priceList.table.textInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.in_pr_USD}/1M`,
+    sortable: true,
+    sortKey: 'in_pr_USD',
+  },
+  {
+    id: 'vec_in_pr_USD',
+    headerKey: 'priceList.table.vecInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.vec_in_pr_USD}/1M`,
+    sortable: true,
+    sortKey: 'vec_in_pr_USD',
   },
 ]
 
 type AnyCols = ColDef<Record<string, unknown>>[]
 
 const COLUMNS_MAP: Record<CategoryConfig['key'], AnyCols> = {
-  text_generation: textGenCols as unknown as AnyCols,
-  multi_model: textGenCols as unknown as AnyCols,
-  image_generation: imageCols as unknown as AnyCols,
-  image_recognition: imageCols as unknown as AnyCols,
-  video_generation: perSecondCols as unknown as AnyCols,
-  video_recognition: perSecondCols as unknown as AnyCols,
-  voice_generation: voiceGenCols as unknown as AnyCols,
-  voice_recognition: perSecondCols as unknown as AnyCols,
+  text_generation: tokenCols as unknown as AnyCols,
+  multi_model: tokenCols as unknown as AnyCols,
+  image_generation: imageGenCols as unknown as AnyCols,
+  image_recognition: tokenCols as unknown as AnyCols,
+  video_generation: videoGenCols as unknown as AnyCols,
+  video_recognition: unitPerSecondCols as unknown as AnyCols,
+  voice_generation: tokenCols as unknown as AnyCols,
+  voice_recognition: unitPerSecondCols as unknown as AnyCols,
   world_model: worldModelCols as unknown as AnyCols,
   vector: vectorCols as unknown as AnyCols,
 }
@@ -262,28 +301,79 @@ type PricingTableProps = {
   emptyLabel: string
 }
 
+function SortIcon({ direction }: { direction: SortDirection | null }) {
+  return (
+    <img
+      src='/l-sort.svg'
+      alt=''
+      className={cn(
+        'inline-block size-4 shrink-0 transition-all',
+        direction === 'desc' && 'rotate-180',
+        direction ? 'opacity-100' : 'opacity-50'
+      )}
+    />
+  )
+}
+
 function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
+  const [sortCol, setSortCol] = useState<string | null>(null)
+  const [sortDir, setSortDir] = useState<SortDirection | null>(null)
+
+  const handleSort = (col: { sortable?: boolean; sortKey?: string }) => {
+    if (!col.sortable || !col.sortKey) return
+    if (sortCol !== col.sortKey) {
+      setSortCol(col.sortKey)
+      setSortDir('asc')
+    } else if (sortDir === 'asc') {
+      setSortDir('desc')
+    } else {
+      setSortDir('asc')
+    }
+  }
+
+  const sortedData = useMemo(() => {
+    if (!sortCol || !sortDir) return data
+    return [...data].sort((a, b) => {
+      const av = Number(a[sortCol] ?? 0)
+      const bv = Number(b[sortCol] ?? 0)
+      return sortDir === 'asc' ? av - bv : bv - av
+    })
+  }, [data, sortCol, sortDir])
+
   return (
     <div className='bg-card overflow-hidden rounded-2xl border border-gray-100 shadow-sm'>
-      <div className='overflow-x-auto'>
+      <div className='max-h-[calc(10*3.5rem+3.5rem)] overflow-y-auto'>
         <table className='w-full text-left'>
-          <thead>
+          <thead className='sticky top-0 z-10'>
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.id}
                   className={cn(
                     'bg-[#FF8A00] py-4 px-6 text-sm font-semibold whitespace-nowrap text-white',
+                    col.sortable && 'cursor-pointer select-none',
                     col.headerClassName
                   )}
+                  onClick={
+                    col.sortable ? () => handleSort(col) : undefined
+                  }
                 >
-                  <TableHeaderLabel k={col.headerKey} />
+                  <span className='inline-flex items-center gap-1.5'>
+                    <TableHeaderLabel k={col.headerKey} />
+                    {col.sortable && (
+                      <SortIcon
+                        direction={
+                          sortCol === col.sortKey ? sortDir : null
+                        }
+                      />
+                    )}
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className='divide-y divide-gray-100 text-sm'>
-            {data.length === 0 ? (
+            {sortedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
@@ -293,7 +383,7 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
                 </td>
               </tr>
             ) : (
-              data.map((row, rowIdx) => (
+              sortedData.map((row, rowIdx) => (
                 <tr
                   key={rowIdx}
                   className='even:bg-[#fafafa] hover:bg-[#fff7ed] transition-colors'
@@ -341,6 +431,8 @@ export function PriceListCategorySection({
 }: PriceListCategorySectionProps) {
   const { t } = useTranslation()
   const columns = COLUMNS_MAP[config.key]
+
+  if (data.length === 0) return null
 
   return (
     <section className='mb-14 last:mb-0'>

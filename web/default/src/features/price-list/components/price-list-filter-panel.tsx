@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
-import { FILTER_GROUPS, FILTER_SCHEME_CLASSES } from '../constants'
+import { FILTER_SCHEME_CLASSES } from '../constants'
 import type {
   FilterGroupConfig,
   FilterGroupKey,
@@ -31,6 +31,7 @@ export type PriceListFilterPanelProps = {
   state: PriceListFilterState
   search: string
   resultCount: number
+  filterGroups: FilterGroupConfig[]
   onGroupChange: (group: FilterGroupKey, value: string) => void
   onSearchChange: (value: string) => void
 }
@@ -62,7 +63,7 @@ export function PriceListFilterPanel(props: PriceListFilterPanelProps) {
         </div>
       </div>
 
-      {FILTER_GROUPS.map((group) => (
+      {props.filterGroups.map((group) => (
         <FilterGroupRow
           key={group.key}
           group={group}
@@ -100,7 +101,7 @@ function FilterGroupRow(props: FilterGroupRowProps) {
           const picked = next.find((v) => v !== props.value) ?? next[0]
           if (picked) props.onChange(picked)
         }}
-        className='flex w-full flex-wrap gap-2 rounded-none'
+        className='flex w-full flex-wrap gap-2'
       >
         {props.group.options.map((opt) => {
           const isActive = props.value === opt.value
@@ -109,7 +110,7 @@ function FilterGroupRow(props: FilterGroupRowProps) {
               key={opt.value}
               value={opt.value}
               className={cn(
-                'rounded-full border px-4 py-1.5 text-sm transition-colors',
+                '!rounded-full border px-4 py-1.5 text-sm transition-colors',
                 isActive ? scheme.active : scheme.inactive
               )}
             >

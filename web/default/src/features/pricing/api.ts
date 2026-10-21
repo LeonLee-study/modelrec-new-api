@@ -25,6 +25,7 @@ import type { PricingData } from './types'
 
 // Get model pricing data
 export async function getPricing(): Promise<PricingData> {
+  // TODO: Rsbuild proxy temporarily routes /api/pricing to remote test server
   const res = await api.get('/api/pricing')
   return res.data
 }

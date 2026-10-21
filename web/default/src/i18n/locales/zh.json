@@ -5283,6 +5283,13 @@
     "priceList.table.textInPrSuidian": "燧点文本输入价/1M",
     "priceList.table.vecInPrUSD": "官方向量输入价 $/1M",
     "priceList.table.vecInPrSuidian": "燧点向量输入价/1M",
-    "priceList.table.noData": "暂无模型数据"
+    "priceList.table.noData": "暂无模型数据",
+    "priceList.note.title": "【计价与汇率说明】",
+    "priceList.note.rechargeLabel": "充值：",
+    "priceList.note.recharge": "¥1 = {{pr_CNY}} 燧点，$1 = {{pr_USD}} 燧点（美元按 1:{{cost_rate}} 固定汇率折算，不随波动）。",
+    "priceList.note.benchmarkLabel": "基准：",
+    "priceList.note.benchmark": "内部锚定 ${{std_USD}}/1M Token（1 美元 = 50 万 Token），推导 1 燧点 = {{suidian_token}} Token 额度。",
+    "priceList.note.settlementLabel": "结算：",
+    "priceList.note.settlement": "模型按官方原价折算燧点，燧点价 = 官方原价（$/1M） × {{pr_USD}} 结算。（会有不定期折扣，详情可关注公告）"
   }
 }

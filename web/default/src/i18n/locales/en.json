@@ -5195,6 +5195,13 @@
     "priceList.table.textInPrSuidian": "Suidian Text Input/1M",
     "priceList.table.vecInPrUSD": "Official Vector Input $/1M",
     "priceList.table.vecInPrSuidian": "Suidian Vector Input/1M",
-    "priceList.table.noData": "No models available"
+    "priceList.table.noData": "No models available",
+    "priceList.note.title": "【Pricing & Exchange Rate Notice】",
+    "priceList.note.rechargeLabel": "Top-up: ",
+    "priceList.note.recharge": "¥1 = {{pr_CNY}} suidian, $1 = {{pr_USD}} suidian (USD converted at a fixed 1:{{cost_rate}} rate, no market fluctuation).",
+    "priceList.note.benchmarkLabel": "Benchmark: ",
+    "priceList.note.benchmark": "Internally anchored at ${{std_USD}}/1M tokens (1 USD = 500,000 tokens), yielding 1 suidian = {{suidian_token}} token credits.",
+    "priceList.note.settlementLabel": "Settlement: ",
+    "priceList.note.settlement": "Models are settled at official price in suidian: suidian price = official price ($/1M) × {{pr_USD}}. (Occasional discounts may apply — see announcements for details.)"
   }
 }

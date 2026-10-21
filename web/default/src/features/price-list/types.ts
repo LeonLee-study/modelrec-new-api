@@ -108,10 +108,14 @@ export type CategoryKey =
   | 'vector'
 
 /**
- * Text generation / multimodal row — input and output prices listed
- * separately, both in USD and suidian (SD) per 1M tokens.
+ * Token-based pricing row — input and output prices listed separately,
+ * both in USD and suidian per 1M tokens.
+ *
+ * Used by: text, multimodal, image_recognize, speech_synthesis.
+ * Matches API fields: official_input_price_usd, official_output_price_usd,
+ * suidian_input_per_1m, suidian_output_per_1m.
  */
-export type TextGenerationRow = {
+export type TokenPricingRow = {
   model_name: string
   provider: string
   in_pr_USD: number
@@ -120,31 +124,18 @@ export type TextGenerationRow = {
   out_pr_SD: number
 }
 
-/** Image generation / recognition row — per-image pricing. */
-export type ImageRow = {
-  model_name: string
-  provider: string
-  pc_pr_USD: number
-  pc_pr_SD: number
-}
-
 /**
- * Video generation / recognition and voice recognition row — per-second
- * pricing.
+ * Unit-based pricing row — single official + suidian price per unit.
+ * The unit varies by category (per image / per call / per second / etc.).
+ *
+ * Used by: image_generate, video_generate, video_recognize, speech_recognize.
+ * Matches API fields: official_unit_price_usd, suidian_unit_price.
  */
-export type PerSecondRow = {
+export type UnitPricingRow = {
   model_name: string
   provider: string
-  s_pr_USD: number
-  s_pr_SD: number
-}
-
-/** Voice generation (TTS) row — per-10K-characters pricing. */
-export type VoiceGenerationRow = {
-  model_name: string
-  provider: string
-  w_pr_USD: number
-  w_pr_SD: number
+  unit_pr_USD: number
+  unit_pr_SD: number
 }
 
 /** World model row — input billed per call, output billed per second. */

@@ -16,125 +16,60 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
   PriceListContent,
   PriceListFilterPanel,
   PriceListHero,
+  PriceListNote,
 } from './components'
-import { CATEGORIES, FILTER_ALL } from './constants'
-import type { CategoryKey, FilterGroupKey, PriceListFilterState } from './types'
-
-const INITIAL_FILTER_STATE: PriceListFilterState = {
-  provider: FILTER_ALL,
-  model_type: FILTER_ALL,
-}
-
-/**
- * Flat list of all model rows across categories. Each row carries a
- * `categoryKey` so it can be distributed into the right table after
- * filtering. Currently empty — the pricing-table API will populate this.
- */
-const SOURCE_DATA: (Record<string, unknown> & { categoryKey: CategoryKey })[] =
-  []
-
-/** Empty category map used as the base for useMemo distribution. */
-const EMPTY_CATEGORY_DATA: Record<CategoryKey, Record<string, unknown>[]> = {
-  text_generation: [],
-  multi_model: [],
-  image_generation: [],
-  image_recognition: [],
-  video_generation: [],
-  video_recognition: [],
-  voice_generation: [],
-  voice_recognition: [],
-  world_model: [],
-  vector: [],
-}
+import { FILTER_ALL, FILTER_GROUPS } from './constants'
+import { usePriceListData } from './hooks/use-price-list-data'
+import type { FilterGroupConfig } from './types'
 
 export function PriceList() {
-  const [filters, setFilters] =
-    useState<PriceListFilterState>(INITIAL_FILTER_STATE)
-  const [search, setSearch] = useState('')
+  const {
+    categoryData,
+    resultCount,
+    providerOptions,
+    vendorCount,
+    modelCount,
+    filters,
+    search,
+    hasActiveFilters,
+    handleGroupChange,
+    handleSearchChange,
+    handleClearFilters,
+  } = usePriceListData()
 
-  // Filter handlers are initialized with the correct shape; actual data-row
-  // filtering is a no-op until the pricing-table API lands and exposes the
-  // model list this state drives.
-  const handleGroupChange = useCallback(
-    (group: FilterGroupKey) => (value: string) => {
-      setFilters((prev) => ({ ...prev, [group]: value }))
-    },
-    []
-  )
-
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value)
-  }, [])
-
-  const handleClearFilters = useCallback(() => {
-    setFilters(INITIAL_FILTER_STATE)
-    setSearch('')
-  }, [])
-
-  const hasActiveFilters =
-    search.trim().length > 0 ||
-    filters.provider !== FILTER_ALL ||
-    filters.model_type !== FILTER_ALL
-
-  // Filter source data by provider + model_type + keyword, then distribute
-  // into per-category buckets. Both steps are no-ops while SOURCE_DATA is
-  // empty; once the pricing-table API populates it the pipeline activates
-  // without further changes.
-  const { categoryData, resultCount } = useMemo(() => {
-    const keyword = search.trim().toLowerCase()
-
-    const filtered = SOURCE_DATA.filter((row) => {
-      if (
-        filters.provider !== FILTER_ALL &&
-        row.provider !== filters.provider
-      ) {
-        return false
+  const filterGroups: FilterGroupConfig[] = useMemo(() => {
+    return FILTER_GROUPS.map((g) => {
+      if (g.key === 'provider') {
+        return {
+          ...g,
+          options: [
+            { value: FILTER_ALL, labelKey: 'All' },
+            ...providerOptions,
+          ],
+        }
       }
-      if (
-        filters.model_type !== FILTER_ALL &&
-        row.categoryKey !== filters.model_type
-      ) {
-        return false
-      }
-      if (keyword) {
-        const name = String(row.model_name ?? '').toLowerCase()
-        if (!name.includes(keyword)) return false
-      }
-      return true
+      return g
     })
-
-    const grouped: Record<CategoryKey, Record<string, unknown>[]> = {
-      ...EMPTY_CATEGORY_DATA,
-    }
-    for (const cat of CATEGORIES) {
-      grouped[cat.key] = []
-    }
-    for (const row of filtered) {
-      const { categoryKey, ...rest } = row
-      grouped[categoryKey].push(rest)
-    }
-
-    return { categoryData: grouped, resultCount: filtered.length }
-  }, [filters.provider, filters.model_type, search])
+  }, [providerOptions])
 
   return (
     <PublicLayout showMainContainer={false}>
       <PageTransition>
-        <PriceListHero />
+        <PriceListHero vendorCount={vendorCount} modelCount={modelCount} />
 
-        {/* 主内容分区底板 */}
         <div className='w-full px-4 pt-8 pb-16'>
           <PriceListFilterPanel
             state={filters}
             search={search}
             resultCount={resultCount}
+            filterGroups={filterGroups}
             onGroupChange={(group, value) => handleGroupChange(group)(value)}
             onSearchChange={handleSearchChange}
           />
@@ -144,6 +79,7 @@ export function PriceList() {
             onClearFilters={handleClearFilters}
             categoryData={categoryData}
           />
+          <PriceListNote />
         </div>
       </PageTransition>
     </PublicLayout>

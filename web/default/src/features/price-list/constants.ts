@@ -84,7 +84,19 @@ export const FILTER_GROUPS: FilterGroupConfig[] = [
     key: 'model_type',
     labelKey: 'priceList.filter.modelType',
     scheme: 'green',
-    options: [{ value: FILTER_ALL, labelKey: 'All' }],
+    options: [
+      { value: FILTER_ALL, labelKey: 'All' },
+      { value: 'text_generation', labelKey: 'priceList.category.textGeneration' },
+      { value: 'multi_model', labelKey: 'priceList.category.multiModel' },
+      { value: 'image_generation', labelKey: 'priceList.category.imageGeneration' },
+      { value: 'image_recognition', labelKey: 'priceList.category.imageRecognition' },
+      { value: 'video_generation', labelKey: 'priceList.category.videoGeneration' },
+      { value: 'video_recognition', labelKey: 'priceList.category.videoRecognition' },
+      { value: 'voice_generation', labelKey: 'priceList.category.voiceGeneration' },
+      { value: 'voice_recognition', labelKey: 'priceList.category.voiceRecognition' },
+      { value: 'world_model', labelKey: 'priceList.category.worldModel' },
+      { value: 'vector', labelKey: 'priceList.category.vector' },
+    ],
   },
 ]
 
