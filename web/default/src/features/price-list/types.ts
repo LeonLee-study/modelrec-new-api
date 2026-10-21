@@ -58,10 +58,10 @@ export type PriceListStats = {
 // ----------------------------------------------------------------------------
 
 /** Filter groups shown as chip rows in the filter panel. */
-export type FilterGroupKey = 'billing' | 'provider' | 'model_type'
+export type FilterGroupKey = 'provider' | 'model_type'
 
 /** Visual scheme for a filter chip row (matches the reference mock). */
-export type FilterGroupScheme = 'purple' | 'orange' | 'green'
+export type FilterGroupScheme = 'orange' | 'green'
 
 /**
  * One filter group's selected value. The sentinel `'all'` (see `FILTER_ALL`)
@@ -94,60 +94,78 @@ export type FilterGroupConfig = {
 // Category table types
 // ----------------------------------------------------------------------------
 
-/** Keys for the six pricing-table category sections. */
+/** Keys for the ten pricing-table category sections. */
 export type CategoryKey =
   | 'text_generation'
-  | 'multi_modal'
+  | 'multi_model'
   | 'image_generation'
+  | 'image_recognition'
   | 'video_generation'
-  | 'voice'
-  | 'substrate'
+  | 'video_recognition'
+  | 'voice_generation'
+  | 'voice_recognition'
+  | 'world_model'
+  | 'vector'
 
 /**
  * Text generation / multimodal row — input and output prices listed
- * separately, both in USD and suidian per 1M tokens.
+ * separately, both in USD and suidian (SD) per 1M tokens.
  */
 export type TextGenerationRow = {
   model_name: string
   provider: string
   in_pr_USD: number
   out_pr_USD: number
-  in_pr_suidian: number
-  out_pr_suidian: number
+  in_pr_SD: number
+  out_pr_SD: number
 }
 
-/** Image generation row — per-image pricing with resolution. */
-export type ImageGenerationRow = {
+/** Image generation / recognition row — per-image pricing. */
+export type ImageRow = {
   model_name: string
   provider: string
-  p_pr_USD: number
-  p_pr_suidian: number
-  res_ratio: string
+  pc_pr_USD: number
+  pc_pr_SD: number
 }
 
-/** Video generation row — per-second pricing with resolution. */
-export type VideoGenerationRow = {
+/**
+ * Video generation / recognition and voice recognition row — per-second
+ * pricing.
+ */
+export type PerSecondRow = {
   model_name: string
   provider: string
   s_pr_USD: number
-  s_pr_suidian: number
-  res_ratio: string
+  s_pr_SD: number
 }
 
-/** Voice / audio row — per-10K-characters pricing with sub-type. */
-export type VoiceRow = {
+/** Voice generation (TTS) row — per-10K-characters pricing. */
+export type VoiceGenerationRow = {
   model_name: string
   provider: string
-  ttw_pr_USD: number
-  ttw_pr_suidian: number
-  ch_type: string
+  w_pr_USD: number
+  w_pr_SD: number
 }
 
-/** Substrate / embedding row — single price with dimension. */
-export type SubstrateRow = {
+/** World model row — input billed per call, output billed per second. */
+export type WorldModelRow = {
   model_name: string
   provider: string
-  pr_USD: number
-  pr_suidian: number
-  dimen: number
+  t_in_pr_USD: number
+  t_in_pr_SD: number
+  s_out_pr_USD: number
+  s_out_pr_SD: number
+}
+
+/**
+ * Vector & retrieval row — text input and vector input prices listed
+ * separately, both in USD and suidian per 1M.
+ */
+export type VectorRow = {
+  model_name: string
+  provider: string
+  in_pr_USD: number
+  in_pr_SD: number
+  vec_in_pr_USD: number
+  vec_in_pr_SD: number
 }

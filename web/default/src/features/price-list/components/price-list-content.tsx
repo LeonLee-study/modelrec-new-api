@@ -25,19 +25,8 @@ export type PriceListContentProps = {
   search: string
   hasActiveFilters: boolean
   onClearFilters: () => void
-}
-
-/**
- * Placeholder data map — every category starts with an empty array.
- * Replace with API-driven data once the pricing-table endpoint lands.
- */
-const PLACEHOLDER_CATEGORY_DATA: Record<CategoryKey, Record<string, unknown>[]> = {
-  text_generation: [],
-  multi_modal: [],
-  image_generation: [],
-  video_generation: [],
-  voice: [],
-  substrate: [],
+  /** Filtered model rows grouped by category key. */
+  categoryData: Record<CategoryKey, Record<string, unknown>[]>
 }
 
 /**
@@ -48,7 +37,7 @@ const PLACEHOLDER_CATEGORY_DATA: Record<CategoryKey, Record<string, unknown>[]> 
  */
 export function PriceListContent(props: PriceListContentProps) {
   const allEmpty = CATEGORIES.every(
-    (cat) => PLACEHOLDER_CATEGORY_DATA[cat.key].length === 0
+    (cat) => props.categoryData[cat.key].length === 0
   )
 
   if (allEmpty && props.hasActiveFilters) {
@@ -69,7 +58,7 @@ export function PriceListContent(props: PriceListContentProps) {
         <PriceListCategorySection
           key={cat.key}
           config={cat}
-          data={PLACEHOLDER_CATEGORY_DATA[cat.key]}
+          data={props.categoryData[cat.key]}
         />
       ))}
     </div>

@@ -21,11 +21,12 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { CategoryConfig } from '../constants'
 import type {
-  ImageGenerationRow,
-  SubstrateRow,
+  ImageRow,
+  PerSecondRow,
   TextGenerationRow,
-  VideoGenerationRow,
-  VoiceRow,
+  VectorRow,
+  VoiceGenerationRow,
+  WorldModelRow,
 } from '../types'
 
 // ----------------------------------------------------------------------------
@@ -42,274 +43,213 @@ type ColDef<T> = {
   render: (row: T) => ReactNode
 }
 
+const NAME_COL = {
+  id: 'model_name',
+  headerKey: 'priceList.table.modelName',
+  headerClassName: 'w-[24%] min-w-[200px]',
+  cellClassName: 'font-bold whitespace-nowrap',
+} as const
+
+const PROVIDER_COL = {
+  id: 'provider',
+  headerKey: 'priceList.table.provider',
+  headerClassName: 'w-[15%] min-w-[120px]',
+  cellClassName: 'text-muted-foreground whitespace-nowrap',
+} as const
+
+const USD_CELL_CLASS =
+  'text-muted-foreground text-xs whitespace-nowrap text-right'
+const SD_CELL_CLASS = 'whitespace-nowrap text-right'
+
+/** Suidian price cell: bold orange number + muted unit suffix. */
+function sdCell(value: number, unit: string): ReactNode {
+  return (
+    <>
+      <span className='text-primary text-base font-bold'>{value}</span>{' '}
+      <span className='text-muted-foreground text-xs font-normal'>{unit}</span>
+    </>
+  )
+}
+
 // ----------------------------------------------------------------------------
 // Per-category column definitions
 // ----------------------------------------------------------------------------
 
+/** 文本 / 多模态 — token 输入输出双价。 */
 const textGenCols: ColDef<TextGenerationRow>[] = [
-  {
-    id: 'model_name',
-    headerKey: 'priceList.table.modelName',
-    headerClassName: 'w-[24%] min-w-[200px]',
-    cellClassName: 'font-bold whitespace-nowrap',
-    render: (r) => r.model_name,
-  },
-  {
-    id: 'provider',
-    headerKey: 'priceList.table.provider',
-    headerClassName: 'w-[15%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground whitespace-nowrap',
-    render: (r) => r.provider,
-  },
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
   {
     id: 'in_pr_USD',
     headerKey: 'priceList.table.inPrUSD',
     headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
+    cellClassName: USD_CELL_CLASS,
     render: (r) => `$${r.in_pr_USD}/1M`,
   },
   {
     id: 'out_pr_USD',
     headerKey: 'priceList.table.outPrUSD',
     headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
+    cellClassName: USD_CELL_CLASS,
     render: (r) => `$${r.out_pr_USD}/1M`,
   },
   {
-    id: 'in_pr_suidian',
+    id: 'in_pr_SD',
     headerKey: 'priceList.table.inPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.in_pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/1M
-        </span>
-      </>
-    ),
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
   },
   {
-    id: 'out_pr_suidian',
+    id: 'out_pr_SD',
     headerKey: 'priceList.table.outPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.out_pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/1M
-        </span>
-      </>
-    ),
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.out_pr_SD, '燧点/1M'),
   },
 ]
 
-const imageGenCols: ColDef<ImageGenerationRow>[] = [
+/** 图片生成 / 图片识别 — 按张计价。 */
+const imageCols: ColDef<ImageRow>[] = [
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'model_name',
-    headerKey: 'priceList.table.modelName',
-    headerClassName: 'w-[24%] min-w-[200px]',
-    cellClassName: 'font-bold whitespace-nowrap',
-    render: (r) => r.model_name,
+    id: 'pc_pr_USD',
+    headerKey: 'priceList.table.pcPrUSD',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.pc_pr_USD}/张`,
   },
   {
-    id: 'provider',
-    headerKey: 'priceList.table.provider',
-    headerClassName: 'w-[15%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground whitespace-nowrap',
-    render: (r) => r.provider,
-  },
-  {
-    id: 'p_pr_USD',
-    headerKey: 'priceList.table.pPrUSD',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => `$${r.p_pr_USD}/张`,
-  },
-  {
-    id: 'p_pr_suidian',
-    headerKey: 'priceList.table.pPrSuidian',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.p_pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/张
-        </span>
-      </>
-    ),
-  },
-  {
-    id: 'res_ratio',
-    headerKey: 'priceList.table.resolution',
-    headerClassName: 'w-[20%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => r.res_ratio,
+    id: 'pc_pr_SD',
+    headerKey: 'priceList.table.pcPrSuidian',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.pc_pr_SD, '燧点/张'),
   },
 ]
 
-const videoGenCols: ColDef<VideoGenerationRow>[] = [
-  {
-    id: 'model_name',
-    headerKey: 'priceList.table.modelName',
-    headerClassName: 'w-[24%] min-w-[200px]',
-    cellClassName: 'font-bold whitespace-nowrap',
-    render: (r) => r.model_name,
-  },
-  {
-    id: 'provider',
-    headerKey: 'priceList.table.provider',
-    headerClassName: 'w-[15%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground whitespace-nowrap',
-    render: (r) => r.provider,
-  },
+/** 视频生成 / 视频识别 / 语音识别 — 按秒计价。 */
+const perSecondCols: ColDef<PerSecondRow>[] = [
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
   {
     id: 's_pr_USD',
     headerKey: 'priceList.table.sPrUSD',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => `$${r.s_pr_USD}/秒`,
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.s_pr_USD}/s`,
   },
   {
-    id: 's_pr_suidian',
+    id: 's_pr_SD',
     headerKey: 'priceList.table.sPrSuidian',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.s_pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/秒
-        </span>
-      </>
-    ),
-  },
-  {
-    id: 'res_ratio',
-    headerKey: 'priceList.table.resolution',
-    headerClassName: 'w-[20%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => r.res_ratio,
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.s_pr_SD, '燧点/s'),
   },
 ]
 
-const voiceCols: ColDef<VoiceRow>[] = [
+/** 语音合成 — 按万字计价。 */
+const voiceGenCols: ColDef<VoiceGenerationRow>[] = [
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'model_name',
-    headerKey: 'priceList.table.modelName',
-    headerClassName: 'w-[24%] min-w-[200px]',
-    cellClassName: 'font-bold whitespace-nowrap',
-    render: (r) => r.model_name,
+    id: 'w_pr_USD',
+    headerKey: 'priceList.table.wPrUSD',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.w_pr_USD}/万字`,
   },
   {
-    id: 'provider',
-    headerKey: 'priceList.table.provider',
-    headerClassName: 'w-[15%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground whitespace-nowrap',
-    render: (r) => r.provider,
-  },
-  {
-    id: 'ttw_pr_USD',
-    headerKey: 'priceList.table.ttwPrUSD',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => `$${r.ttw_pr_USD}/万字`,
-  },
-  {
-    id: 'ttw_pr_suidian',
-    headerKey: 'priceList.table.ttwPrSuidian',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.ttw_pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/万字
-        </span>
-      </>
-    ),
-  },
-  {
-    id: 'ch_type',
-    headerKey: 'priceList.table.chType',
-    headerClassName: 'w-[20%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => r.ch_type,
+    id: 'w_pr_SD',
+    headerKey: 'priceList.table.wPrSuidian',
+    headerClassName: 'w-[30%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.w_pr_SD, '燧点/万字'),
   },
 ]
 
-const substrateCols: ColDef<SubstrateRow>[] = [
+/** 世界模型 — 输入按次、输出按秒。 */
+const worldModelCols: ColDef<WorldModelRow>[] = [
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
   {
-    id: 'model_name',
-    headerKey: 'priceList.table.modelName',
-    headerClassName: 'w-[24%] min-w-[200px]',
-    cellClassName: 'font-bold whitespace-nowrap',
-    render: (r) => r.model_name,
+    id: 't_in_pr_USD',
+    headerKey: 'priceList.table.tInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.t_in_pr_USD}/次`,
   },
   {
-    id: 'provider',
-    headerKey: 'priceList.table.provider',
-    headerClassName: 'w-[15%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground whitespace-nowrap',
-    render: (r) => r.provider,
+    id: 't_in_pr_SD',
+    headerKey: 'priceList.table.tInPrSuidian',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.t_in_pr_SD, '燧点/次'),
   },
   {
-    id: 'pr_USD',
-    headerKey: 'priceList.table.prUSD',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => `$${r.pr_USD}/1M`,
+    id: 's_out_pr_USD',
+    headerKey: 'priceList.table.sOutPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.s_out_pr_USD}/s`,
   },
   {
-    id: 'pr_suidian',
-    headerKey: 'priceList.table.prSuidian',
-    headerClassName: 'w-[20%] min-w-[132px]',
-    cellClassName: 'whitespace-nowrap text-right',
-    render: (r) => (
-      <>
-        <span className='text-primary text-base font-bold'>
-          {r.pr_suidian}
-        </span>{' '}
-        <span className='text-muted-foreground text-xs font-normal'>
-          燧点/1M
-        </span>
-      </>
-    ),
-  },
-  {
-    id: 'dimen',
-    headerKey: 'priceList.table.dimension',
-    headerClassName: 'w-[20%] min-w-[120px]',
-    cellClassName: 'text-muted-foreground text-xs whitespace-nowrap text-right',
-    render: (r) => String(r.dimen),
+    id: 's_out_pr_SD',
+    headerKey: 'priceList.table.sOutPrSuidian',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.s_out_pr_SD, '燧点/s'),
   },
 ]
 
-// text_generation and multi_modal share the same column shape.
-const COLUMNS_MAP: Record<
-  CategoryConfig['key'],
-  ColDef<Record<string, unknown>>[]
-> = {
-  text_generation: textGenCols as unknown as ColDef<Record<string, unknown>>[],
-  multi_modal: textGenCols as unknown as ColDef<Record<string, unknown>>[],
-  image_generation:
-    imageGenCols as unknown as ColDef<Record<string, unknown>>[],
-  video_generation:
-    videoGenCols as unknown as ColDef<Record<string, unknown>>[],
-  voice: voiceCols as unknown as ColDef<Record<string, unknown>>[],
-  substrate: substrateCols as unknown as ColDef<Record<string, unknown>>[],
+/** 向量与检索 — 文本输入与向量输入双价。 */
+const vectorCols: ColDef<VectorRow>[] = [
+  { ...NAME_COL, render: (r) => r.model_name },
+  { ...PROVIDER_COL, render: (r) => r.provider },
+  {
+    id: 'in_pr_USD',
+    headerKey: 'priceList.table.textInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.in_pr_USD}/1M`,
+  },
+  {
+    id: 'in_pr_SD',
+    headerKey: 'priceList.table.textInPrSuidian',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
+  },
+  {
+    id: 'vec_in_pr_USD',
+    headerKey: 'priceList.table.vecInPrUSD',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: USD_CELL_CLASS,
+    render: (r) => `$${r.vec_in_pr_USD}/1M`,
+  },
+  {
+    id: 'vec_in_pr_SD',
+    headerKey: 'priceList.table.vecInPrSuidian',
+    headerClassName: 'w-[15.25%] min-w-[132px]',
+    cellClassName: SD_CELL_CLASS,
+    render: (r) => sdCell(r.vec_in_pr_SD, '燧点/1M'),
+  },
+]
+
+type AnyCols = ColDef<Record<string, unknown>>[]
+
+const COLUMNS_MAP: Record<CategoryConfig['key'], AnyCols> = {
+  text_generation: textGenCols as unknown as AnyCols,
+  multi_model: textGenCols as unknown as AnyCols,
+  image_generation: imageCols as unknown as AnyCols,
+  image_recognition: imageCols as unknown as AnyCols,
+  video_generation: perSecondCols as unknown as AnyCols,
+  video_recognition: perSecondCols as unknown as AnyCols,
+  voice_generation: voiceGenCols as unknown as AnyCols,
+  voice_recognition: perSecondCols as unknown as AnyCols,
+  world_model: worldModelCols as unknown as AnyCols,
+  vector: vectorCols as unknown as AnyCols,
 }
 
 // ----------------------------------------------------------------------------
@@ -317,7 +257,7 @@ const COLUMNS_MAP: Record<
 // ----------------------------------------------------------------------------
 
 type PricingTableProps = {
-  columns: ColDef<Record<string, unknown>>[]
+  columns: AnyCols
   data: Record<string, unknown>[]
   emptyLabel: string
 }
@@ -337,11 +277,7 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
                     col.headerClassName
                   )}
                 >
-                  {col.headerKey.includes('.') ? (
-                    <TableHeaderLabel k={col.headerKey} />
-                  ) : (
-                    col.headerKey
-                  )}
+                  <TableHeaderLabel k={col.headerKey} />
                 </th>
               ))}
             </tr>

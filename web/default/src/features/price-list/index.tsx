@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
@@ -24,13 +24,34 @@ import {
   PriceListFilterPanel,
   PriceListHero,
 } from './components'
-import { FILTER_ALL } from './constants'
-import type { FilterGroupKey, PriceListFilterState } from './types'
+import { CATEGORIES, FILTER_ALL } from './constants'
+import type { CategoryKey, FilterGroupKey, PriceListFilterState } from './types'
 
 const INITIAL_FILTER_STATE: PriceListFilterState = {
-  billing: FILTER_ALL,
   provider: FILTER_ALL,
   model_type: FILTER_ALL,
+}
+
+/**
+ * Flat list of all model rows across categories. Each row carries a
+ * `categoryKey` so it can be distributed into the right table after
+ * filtering. Currently empty — the pricing-table API will populate this.
+ */
+const SOURCE_DATA: (Record<string, unknown> & { categoryKey: CategoryKey })[] =
+  []
+
+/** Empty category map used as the base for useMemo distribution. */
+const EMPTY_CATEGORY_DATA: Record<CategoryKey, Record<string, unknown>[]> = {
+  text_generation: [],
+  multi_model: [],
+  image_generation: [],
+  image_recognition: [],
+  video_generation: [],
+  video_recognition: [],
+  voice_generation: [],
+  voice_recognition: [],
+  world_model: [],
+  vector: [],
 }
 
 export function PriceList() {
@@ -59,9 +80,49 @@ export function PriceList() {
 
   const hasActiveFilters =
     search.trim().length > 0 ||
-    filters.billing !== FILTER_ALL ||
     filters.provider !== FILTER_ALL ||
     filters.model_type !== FILTER_ALL
+
+  // Filter source data by provider + model_type + keyword, then distribute
+  // into per-category buckets. Both steps are no-ops while SOURCE_DATA is
+  // empty; once the pricing-table API populates it the pipeline activates
+  // without further changes.
+  const { categoryData, resultCount } = useMemo(() => {
+    const keyword = search.trim().toLowerCase()
+
+    const filtered = SOURCE_DATA.filter((row) => {
+      if (
+        filters.provider !== FILTER_ALL &&
+        row.provider !== filters.provider
+      ) {
+        return false
+      }
+      if (
+        filters.model_type !== FILTER_ALL &&
+        row.categoryKey !== filters.model_type
+      ) {
+        return false
+      }
+      if (keyword) {
+        const name = String(row.model_name ?? '').toLowerCase()
+        if (!name.includes(keyword)) return false
+      }
+      return true
+    })
+
+    const grouped: Record<CategoryKey, Record<string, unknown>[]> = {
+      ...EMPTY_CATEGORY_DATA,
+    }
+    for (const cat of CATEGORIES) {
+      grouped[cat.key] = []
+    }
+    for (const row of filtered) {
+      const { categoryKey, ...rest } = row
+      grouped[categoryKey].push(rest)
+    }
+
+    return { categoryData: grouped, resultCount: filtered.length }
+  }, [filters.provider, filters.model_type, search])
 
   return (
     <PublicLayout showMainContainer={false}>
@@ -73,7 +134,7 @@ export function PriceList() {
           <PriceListFilterPanel
             state={filters}
             search={search}
-            resultCount={0}
+            resultCount={resultCount}
             onGroupChange={(group, value) => handleGroupChange(group)(value)}
             onSearchChange={handleSearchChange}
           />
@@ -81,6 +142,7 @@ export function PriceList() {
             search={search}
             hasActiveFilters={hasActiveFilters}
             onClearFilters={handleClearFilters}
+            categoryData={categoryData}
           />
         </div>
       </PageTransition>

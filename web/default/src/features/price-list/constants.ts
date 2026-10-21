@@ -52,16 +52,10 @@ export const PLACEHOLDER_STATS: PriceListStats = {
 }
 
 /**
- * Active/inactive class pairs for the three filter chip rows, keyed by
- * scheme. Colors match the reference mock (purple = billing, orange =
- * provider, green = model_type).
+ * Active/inactive class pairs for the filter chip rows, keyed by scheme.
+ * Orange = provider, green = model_type.
  */
 export const FILTER_SCHEME_CLASSES = {
-  purple: {
-    active: 'border-transparent bg-[#7C3AED] text-white hover:bg-[#6D28D9]',
-    inactive:
-      'border-[#e7e0d3] bg-white text-gray-700 hover:border-[#7C3AED] hover:text-[#7C3AED]',
-  },
   orange: {
     active: 'border-transparent bg-[#FF8A00] text-white hover:bg-[#E67600]',
     inactive:
@@ -75,17 +69,11 @@ export const FILTER_SCHEME_CLASSES = {
 } as const
 
 /**
- * Declarative config for the three filter rows. Each group starts with a
- * single `All` chip; additional options will be populated from the pricing
- * table API once it lands.
+ * Declarative config for the two filter rows (provider + model_type).
+ * Each group starts with a single `All` chip; additional options will be
+ * populated from the pricing table API once it lands.
  */
 export const FILTER_GROUPS: FilterGroupConfig[] = [
-  {
-    key: 'billing',
-    labelKey: 'priceList.filter.billing',
-    scheme: 'purple',
-    options: [{ value: FILTER_ALL, labelKey: 'All' }],
-  },
   {
     key: 'provider',
     labelKey: 'priceList.filter.provider',
@@ -116,9 +104,9 @@ export type CategoryConfig = {
 }
 
 /**
- * Ordered list of the six category sections rendered in the main content area.
- * Column definitions and row types live in the category-section component
- * because each category has a distinct column shape.
+ * Ordered list of the ten category sections rendered in the main content
+ * area. Column definitions and row types live in the category-section
+ * component because each category has a distinct column shape.
  *
  * Row data for every category is currently an empty array; the pricing-table
  * API will populate them later.
@@ -131,9 +119,9 @@ export const CATEGORIES: CategoryConfig[] = [
     emoji: '📝',
   },
   {
-    key: 'multi_modal',
-    labelKey: 'priceList.category.multiModal',
-    subtitleKey: 'priceList.category.multiModalSub',
+    key: 'multi_model',
+    labelKey: 'priceList.category.multiModel',
+    subtitleKey: 'priceList.category.multiModelSub',
     emoji: '🖼️',
   },
   {
@@ -143,21 +131,45 @@ export const CATEGORIES: CategoryConfig[] = [
     emoji: '🎨',
   },
   {
+    key: 'image_recognition',
+    labelKey: 'priceList.category.imageRecognition',
+    subtitleKey: 'priceList.category.imageRecognitionSub',
+    emoji: '👁️',
+  },
+  {
     key: 'video_generation',
     labelKey: 'priceList.category.videoGeneration',
     subtitleKey: 'priceList.category.videoGenerationSub',
     emoji: '🎬',
   },
   {
-    key: 'voice',
-    labelKey: 'priceList.category.voice',
-    subtitleKey: 'priceList.category.voiceSub',
+    key: 'video_recognition',
+    labelKey: 'priceList.category.videoRecognition',
+    subtitleKey: 'priceList.category.videoRecognitionSub',
+    emoji: '🎞️',
+  },
+  {
+    key: 'voice_generation',
+    labelKey: 'priceList.category.voiceGeneration',
+    subtitleKey: 'priceList.category.voiceGenerationSub',
     emoji: '🔊',
   },
   {
-    key: 'substrate',
-    labelKey: 'priceList.category.substrate',
-    subtitleKey: 'priceList.category.substrateSub',
+    key: 'voice_recognition',
+    labelKey: 'priceList.category.voiceRecognition',
+    subtitleKey: 'priceList.category.voiceRecognitionSub',
+    emoji: '🎙️',
+  },
+  {
+    key: 'world_model',
+    labelKey: 'priceList.category.worldModel',
+    subtitleKey: 'priceList.category.worldModelSub',
+    emoji: '🌍',
+  },
+  {
+    key: 'vector',
+    labelKey: 'priceList.category.vector',
+    subtitleKey: 'priceList.category.vectorSub',
     emoji: '🧩',
   },
 ]
