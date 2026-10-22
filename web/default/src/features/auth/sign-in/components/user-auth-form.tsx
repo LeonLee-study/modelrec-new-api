@@ -108,9 +108,6 @@ export function UserAuthForm({
   const passkeyLoginEnabled = Boolean(
     status?.passkey_login ?? status?.data?.passkey_login
   )
-  const hasUserAgreement = Boolean(status?.user_agreement_enabled)
-  const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
-  const requiresLegalConsent = hasUserAgreement || hasPrivacyPolicy
   const hasWeChatLogin = Boolean(status?.wechat_login)
   const hasOAuthLogin = Boolean(
     status?.github_oauth ||
@@ -121,7 +118,7 @@ export function UserAuthForm({
   )
   const hasAlternativeLogin =
     passkeyLoginEnabled || hasWeChatLogin || hasOAuthLogin
-  const legalConsentMissing = requiresLegalConsent && !agreedToLegal
+  const legalConsentMissing = !agreedToLegal
 
   const currentSchema = useMemo(
     () => (loginMode === 'sms' ? smsLoginFormSchema : loginFormSchema),
@@ -142,10 +139,6 @@ export function UserAuthForm({
   const smsButtonLabel = isSmsActive
     ? t('Resend ({{seconds}}s)', { seconds: smsSecondsLeft })
     : t('Send code')
-
-  useEffect(() => {
-    setAgreedToLegal(!requiresLegalConsent)
-  }, [requiresLegalConsent])
 
   useEffect(() => {
     detectPasskeySupport()
@@ -401,7 +394,6 @@ export function UserAuthForm({
         )}
 
         <LegalConsent
-          status={status}
           checked={agreedToLegal}
           onCheckedChange={setAgreedToLegal}
           variant='inline'
