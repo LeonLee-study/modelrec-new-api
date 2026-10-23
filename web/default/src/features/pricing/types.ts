@@ -68,6 +68,28 @@ export type PricingModel = {
   input_modalities?: Modality[]
   output_modalities?: Modality[]
   capabilities?: ModelCapability[]
+
+  // LG-02: category + official/suidian pricing fields
+  category_l1?: string
+  category_l2?: string
+  pricing_kind?: string
+  official_input_price_usd?: number | null
+  official_output_price_usd?: number | null
+  suidian_input_per_1m?: number | null
+  suidian_output_per_1m?: number | null
+  official_unit_price_usd?: number | null
+  suidian_unit_price?: number | null
+  official_input_per_call_usd?: number | null
+  suidian_input_per_call?: number | null
+  official_output_per_second_usd?: number | null
+  suidian_output_per_second?: number | null
+  official_text_input_price_usd?: number | null
+  suidian_text_input_per_1m?: number | null
+  official_vector_input_price_usd?: number | null
+  suidian_vector_input_per_1m?: number | null
+  resolution?: string
+  subtype?: string
+  dimension?: string
 }
 
 /** Input/output modalities supported by a model. */
@@ -93,6 +115,8 @@ export type PricingData = {
   message?: string
   data: PricingModel[]
   vendors: PricingVendor[]
+  vendor_count: number
+  model_count: number
   group_ratio: Record<string, number>
   usable_group: Record<string, { desc: string; ratio: number }>
   supported_endpoint: Record<string, string>
