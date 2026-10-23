@@ -21,6 +21,7 @@ type Pricing struct {
 	Icon                   string                  `json:"icon,omitempty"`
 	Tags                   string                  `json:"tags,omitempty"`
 	VendorID               int                     `json:"vendor_id,omitempty"`
+	VendorName             string                  `json:"vendor_name,omitempty"`
 	QuotaType              int                     `json:"quota_type"`
 	ModelRatio             float64                 `json:"model_ratio"`
 	ModelPrice             float64                 `json:"model_price"`
@@ -36,6 +37,30 @@ type Pricing struct {
 	BillingMode            string                  `json:"billing_mode,omitempty"`
 	BillingExpr            string                  `json:"billing_expr,omitempty"`
 	PricingVersion         string                  `json:"pricing_version,omitempty"`
+
+	// LG-02：类别 + 官方价/燧点价合表字段（按 pricing_kind 填充）
+	CategoryL1             string   `json:"category_l1,omitempty"`
+	CategoryL2             string   `json:"category_l2,omitempty"`
+	PricingKind            string   `json:"pricing_kind,omitempty"`
+	OfficialInputPriceUSD  *float64 `json:"official_input_price_usd,omitempty"`
+	OfficialOutputPriceUSD *float64 `json:"official_output_price_usd,omitempty"`
+	SuidianInputPer1M      *float64 `json:"suidian_input_per_1m,omitempty"`
+	SuidianOutputPer1M     *float64 `json:"suidian_output_per_1m,omitempty"`
+	OfficialUnitPriceUSD   *float64 `json:"official_unit_price_usd,omitempty"` // 按张/按秒/按万字
+	SuidianUnitPrice       *float64 `json:"suidian_unit_price,omitempty"`
+	// 世界模型：输入按次、输出按秒
+	OfficialInputPerCallUSD    *float64 `json:"official_input_per_call_usd,omitempty"`
+	SuidianInputPerCall        *float64 `json:"suidian_input_per_call,omitempty"`
+	OfficialOutputPerSecondUSD *float64 `json:"official_output_per_second_usd,omitempty"`
+	SuidianOutputPerSecond     *float64 `json:"suidian_output_per_second,omitempty"`
+	// 向量与检索
+	OfficialTextInputPriceUSD   *float64 `json:"official_text_input_price_usd,omitempty"`
+	SuidianTextInputPer1M       *float64 `json:"suidian_text_input_per_1m,omitempty"`
+	OfficialVectorInputPriceUSD *float64 `json:"official_vector_input_price_usd,omitempty"`
+	SuidianVectorInputPer1M     *float64 `json:"suidian_vector_input_per_1m,omitempty"`
+	Resolution                  string   `json:"resolution,omitempty"`
+	Subtype                     string   `json:"subtype,omitempty"`
+	Dimension                   string   `json:"dimension,omitempty"`
 }
 
 type PricingVendor struct {
@@ -199,6 +224,17 @@ func updatePricing() {
 		groups.Add(ability.Group)
 	}
 
+	// LG-02：无筛选时列表 = 模型广场全部启用模型（不依赖是否已绑渠道；无分组有则带上）
+	for i := range allMeta {
+		m := &allMeta[i]
+		if m.NameRule != NameRuleExact || m.Status != 1 {
+			continue
+		}
+		if _, ok := modelGroupsMap[m.ModelName]; !ok {
+			modelGroupsMap[m.ModelName] = types.NewSet[string]()
+		}
+	}
+
 	//这里使用切片而不是Set，因为一个模型可能支持多个端点类型，并且第一个端点是优先使用端点
 	modelSupportEndpointsStr := make(map[string][]string)
 
@@ -293,7 +329,7 @@ func updatePricing() {
 			SupportedEndpointTypes: modelSupportEndpointTypes[model],
 		}
 
-		// 补充模型元数据（描述、标签、供应商、状态）
+		// 补充模型元数据（描述、标签、供应商、状态、分类）
 		if meta, ok := metaMap[model]; ok {
 			// 若模型被禁用(status!=1)，则直接跳过，不返回给前端
 			if meta.Status != 1 {
@@ -303,6 +339,15 @@ func updatePricing() {
 			pricing.Icon = meta.Icon
 			pricing.Tags = meta.Tags
 			pricing.VendorID = meta.VendorID
+			pricing.CategoryL1 = meta.CategoryL1
+			pricing.CategoryL2 = meta.CategoryL2
+			pricing.PricingKind = meta.PricingKind
+			pricing.Resolution = meta.Resolution
+			pricing.Subtype = meta.Subtype
+			pricing.Dimension = meta.Dimension
+			if v, ok := vendorMap[meta.VendorID]; ok && v != nil {
+				pricing.VendorName = v.Name
+			}
 		}
 		modelPrice, findPrice := ratio_setting.GetModelPrice(model, false)
 		if findPrice {
@@ -337,6 +382,7 @@ func updatePricing() {
 				pricing.BillingExpr = expr
 			}
 		}
+		ApplyOfficialPricingFields(&pricing)
 		pricingMap = append(pricingMap, pricing)
 	}
 

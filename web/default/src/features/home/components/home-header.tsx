@@ -28,6 +28,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
+import { DEFAULT_LOGO } from '@/lib/constants'
 import { formatQuota } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
@@ -62,9 +63,11 @@ export function HomeHeader() {
                 src={logo}
                 loading={loading}
                 logoLoaded={logoLoaded}
-                className='size-7 rounded-lg object-contain'
+                className='h-7 w-auto object-contain'
               />
-              {systemName || t('AI Routing')}
+              {logo && logo !== DEFAULT_LOGO && (
+                systemName || t('AI Routing')
+              )}
             </Link>
           </div>
 

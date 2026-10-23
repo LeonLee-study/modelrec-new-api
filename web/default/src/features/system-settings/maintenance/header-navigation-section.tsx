@@ -51,6 +51,8 @@ const headerNavSchema = z.object({
   console: z.boolean(),
   pricingEnabled: z.boolean(),
   pricingRequireAuth: z.boolean(),
+  priceListEnabled: z.boolean(),
+  priceListRequireAuth: z.boolean(),
   rankingsEnabled: z.boolean(),
   rankingsRequireAuth: z.boolean(),
   playground: z.boolean(),
@@ -80,6 +82,14 @@ const toFormValues = (config: HeaderNavModulesConfig): HeaderNavFormValues => ({
     config.pricing?.requireAuth === undefined
       ? HEADER_NAV_DEFAULT.pricing.requireAuth
       : Boolean(config.pricing.requireAuth),
+  priceListEnabled:
+    config.price_list?.enabled === undefined
+      ? HEADER_NAV_DEFAULT.price_list.enabled
+      : Boolean(config.price_list.enabled),
+  priceListRequireAuth:
+    config.price_list?.requireAuth === undefined
+      ? HEADER_NAV_DEFAULT.price_list.requireAuth
+      : Boolean(config.price_list.requireAuth),
   rankingsEnabled:
     config.rankings?.enabled === undefined
       ? HEADER_NAV_DEFAULT.rankings.enabled
@@ -129,6 +139,11 @@ export function HeaderNavigationSection({
         ...(config.pricing ?? HEADER_NAV_DEFAULT.pricing),
         enabled: values.pricingEnabled,
         requireAuth: values.pricingRequireAuth,
+      },
+      price_list: {
+        ...(config.price_list ?? HEADER_NAV_DEFAULT.price_list),
+        enabled: values.priceListEnabled,
+        requireAuth: values.priceListRequireAuth,
       },
       rankings: {
         ...(config.rankings ?? HEADER_NAV_DEFAULT.rankings),
@@ -187,7 +202,10 @@ export function HeaderNavigationSection({
   const accessModules: Array<{
     enabledKey: keyof HeaderNavFormValues
     requireAuthKey: keyof HeaderNavFormValues
-    requireAuthDependsOn: 'pricingEnabled' | 'rankingsEnabled'
+    requireAuthDependsOn:
+      | 'pricingEnabled'
+      | 'priceListEnabled'
+      | 'rankingsEnabled'
     title: string
     description: string
     requireAuthTitle: string
@@ -202,6 +220,17 @@ export function HeaderNavigationSection({
       requireAuthTitle: t('Require login to view models'),
       requireAuthDescription: t(
         'Visitors must authenticate before accessing the pricing directory.'
+      ),
+    },
+    {
+      enabledKey: 'priceListEnabled',
+      requireAuthKey: 'priceListRequireAuth',
+      requireAuthDependsOn: 'priceListEnabled',
+      title: t('Pricing'),
+      description: t('Public price list page.'),
+      requireAuthTitle: t('Require login to view price list'),
+      requireAuthDescription: t(
+        'Visitors must authenticate before accessing the price list page.'
       ),
     },
     {

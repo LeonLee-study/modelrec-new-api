@@ -67,10 +67,7 @@ export function SignUpForm({
   const [agreedToLegal, setAgreedToLegal] = useState(false)
   const [isWeChatDialogOpen, setIsWeChatDialogOpen] = useState(false)
 
-  const hasUserAgreement = Boolean(status?.user_agreement_enabled)
-  const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
-  const requiresLegalConsent = hasUserAgreement || hasPrivacyPolicy
-  const legalConsentMissing = requiresLegalConsent && !agreedToLegal
+  const legalConsentMissing = !agreedToLegal
   const emailRegistrationEnabled = Boolean(status?.email_verification)
   const hasWeChatLogin = Boolean(status?.wechat_login)
   const hasOAuthLogin = Boolean(
@@ -126,10 +123,6 @@ export function SignUpForm({
   if (isSendingSms || isSendingEmail) {
     verificationButtonContent = <Loader2 className='h-4 w-4 animate-spin' />
   }
-
-  useEffect(() => {
-    setAgreedToLegal(!requiresLegalConsent)
-  }, [requiresLegalConsent])
 
   useEffect(() => {
     const affiliateCode = new URLSearchParams(window.location.search)
@@ -396,7 +389,6 @@ export function SignUpForm({
         <HumanVerificationField verification={humanVerification} />
 
         <LegalConsent
-          status={status}
           checked={agreedToLegal}
           onCheckedChange={setAgreedToLegal}
           variant='inline'

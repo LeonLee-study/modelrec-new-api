@@ -19,6 +19,11 @@ func filterPricingByUsableGroups(pricing []model.Pricing, usableGroup map[string
 
 	filtered := make([]model.Pricing, 0, len(pricing))
 	for _, item := range pricing {
+		// LG-02：模型广场启用模型未绑渠道时 enable_groups 为空，仍应对定价页展示
+		if len(item.EnableGroup) == 0 {
+			filtered = append(filtered, item)
+			continue
+		}
 		if common.StringsContains(item.EnableGroup, "all") {
 			filtered = append(filtered, item)
 			continue
@@ -64,10 +69,21 @@ func GetPricing(c *gin.Context) {
 		}
 	}
 
+	// LG-02：抬头厂商数/模型数与当前定价列表同源（实时）
+	modelCount := len(pricing)
+	vendorSet := make(map[int]struct{}, len(pricing))
+	for _, item := range pricing {
+		if item.VendorID > 0 {
+			vendorSet[item.VendorID] = struct{}{}
+		}
+	}
+
 	c.JSON(200, gin.H{
 		"success":            true,
 		"data":               pricing,
 		"vendors":            model.GetVendors(),
+		"vendor_count":       len(vendorSet),
+		"model_count":        modelCount,
 		"group_ratio":        groupRatio,
 		"usable_group":       usableGroup,
 		"supported_endpoint": model.GetSupportedEndpointMap(),
