@@ -30,6 +30,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useSystemConfig } from "@/hooks/use-system-config";
 import { useTopNavLinks } from "@/hooks/use-top-nav-links";
+import { DEFAULT_LOGO } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -207,7 +208,7 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   let logoContent: React.ReactNode;
   if (loading) {
-    logoContent = <Skeleton className="size-full rounded-lg" />;
+    logoContent = <Skeleton className="h-7 w-auto rounded-lg" />;
   } else if (customLogo) {
     logoContent = customLogo;
   } else {
@@ -216,7 +217,7 @@ export function PublicHeader(props: PublicHeaderProps) {
         src={systemLogo}
         loading={loading}
         logoLoaded={logoLoaded}
-        className="size-full rounded-lg object-contain"
+        className="h-7 w-auto object-contain"
       />
     );
   }
@@ -243,13 +244,13 @@ export function PublicHeader(props: PublicHeaderProps) {
       <header className="pointer-events-none sticky top-0 z-50 h-[var(--header-height,4rem)]">
         <nav className="sf-header-transparent pointer-events-auto flex h-full items-center justify-between px-6 [font-family:var(--font-navigation)] backdrop-blur-xl">
           {/* Logo */}
-          <Link to={homeUrl} className="group flex shrink-0 items-center gap-0">
-            <div className="flex size-7 shrink-0 items-center justify-center transition-all duration-300 group-hover:scale-105">
-              {logoContent}
-            </div>
-            <span className="text-primary text-xl font-bold tracking-tight">
-              {loading ? <Skeleton className="h-4 w-16" /> : displaySiteName}
-            </span>
+          <Link to={homeUrl} className="flex shrink-0 items-center gap-0 text-xl font-bold tracking-tight text-[#ff8700]">
+            {logoContent}
+            {!loading && systemLogo && systemLogo !== DEFAULT_LOGO && (
+              <span className="text-primary">
+                {displaySiteName}
+              </span>
+            )}
           </Link>
 
           {/* Desktop nav */}
