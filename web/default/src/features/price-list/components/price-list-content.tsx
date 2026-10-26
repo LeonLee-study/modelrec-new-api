@@ -42,7 +42,7 @@ export function PriceListContent(props: PriceListContentProps) {
 
   if (allEmpty && props.hasActiveFilters) {
     return (
-      <div className='max-w-6xl'>
+      <div className='mx-auto max-w-6xl'>
         <EmptyState
           searchQuery={props.search}
           hasActiveFilters={props.hasActiveFilters}
@@ -53,7 +53,7 @@ export function PriceListContent(props: PriceListContentProps) {
   }
 
   return (
-    <div className='max-w-6xl'>
+    <div className='mx-auto max-w-6xl'>
       {CATEGORIES.map((cat) => (
         <PriceListCategorySection
           key={cat.key}
