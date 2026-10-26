@@ -38,7 +38,7 @@ export function PriceListNote() {
   )
 
   return (
-    <div className='mx-auto mt-14 max-w-4xl px-4 pb-16'>
+    <div className='mt-14 max-w-4xl px-4 pb-16'>
       <div className='rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-left dark:border-gray-700 dark:bg-gray-900'>
         <p className='text-xs leading-relaxed font-medium text-gray-600 dark:text-gray-300'>
           {t('priceList.note.title')}
