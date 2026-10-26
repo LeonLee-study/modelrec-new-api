@@ -125,21 +125,22 @@ export function HomeHeader() {
                 </Link>
               )}
 
-              {!user && (
+              {/* Register button hidden — kept for easy restoration */}
+              {/* {!user && (
                 <Link
                   to='/sign-up'
                   className='sf-btn-primary inline-flex h-9 items-center justify-center rounded-lg px-5 text-sm font-semibold text-white'
                 >
                   {t('Register')}
                 </Link>
-              )}
+              )} */}
 
               {user ? (
                 <ProfileDropdown />
               ) : (
                 <Link
                   to='/sign-in'
-                  className='inline-flex h-9 items-center justify-center rounded-lg border border-[#d8d9dd] bg-white px-5 text-sm font-semibold text-[#374151] transition-colors hover:border-[#ff8700] hover:text-[#ff8700] dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-[#ff8700] dark:hover:text-[#ff9f33]'
+                  className='sf-btn-primary inline-flex h-9 items-center justify-center rounded-lg px-5 text-sm font-semibold text-white'
                 >
                   {t('Sign in')}
                 </Link>
@@ -209,21 +210,22 @@ export function HomeHeader() {
           )}
         </nav>
 
-        <div className='mt-8 grid grid-cols-2 gap-3'>
+        <div className='mt-8 grid grid-cols-1 gap-3'>
           <Link
             to='/sign-in'
             onClick={() => setMobileOpen(false)}
-            className='dark:bg-card inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d9dd] bg-white text-sm font-semibold'
+            className='sf-btn-primary inline-flex h-11 items-center justify-center rounded-xl text-sm font-semibold text-white'
           >
             {t('Sign in')}
           </Link>
-          <Link
+          {/* Register button hidden — kept for easy restoration */}
+          {/* <Link
             to='/sign-up'
             onClick={() => setMobileOpen(false)}
             className='sf-btn-primary inline-flex h-11 items-center justify-center rounded-xl text-sm font-semibold text-white'
           >
             {t('Register')}
-          </Link>
+          </Link> */}
         </div>
       </div>
     </>
