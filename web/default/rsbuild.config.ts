@@ -19,6 +19,8 @@ export default defineConfig(({ envMode }) => {
 
   const isProd = envMode === "production";
   const devProxy = {
+    // TODO: temporary — route pricing to remote test server (avoids CORS)
+    "/api/pricing": { target: "http://47.121.128.119", changeOrigin: true },
     "/api/v2": { target: smsServiceUrl, changeOrigin: true },
     ...Object.fromEntries(
       (["/api", "/mj", "/pg"] as const).map((key) => [
@@ -72,6 +74,7 @@ export default defineConfig(({ envMode }) => {
     },
     server: {
       host: "0.0.0.0",
+      port: 3005,
       strictPort: false,
       proxy: devProxy,
     },

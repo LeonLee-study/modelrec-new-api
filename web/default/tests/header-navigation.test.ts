@@ -37,4 +37,30 @@ describe('header navigation configuration', () => {
     expect(parseRuntimeHeaderNavModules(serialized).playground).toBe(false)
     expect(parseSettingsHeaderNavModules(serialized).playground).toBe(false)
   })
+
+  test('treats Price List as an access module with public defaults', () => {
+    const publicAccess = { enabled: true, requireAuth: false }
+
+    expect(parseRuntimeHeaderNavModules(undefined).price_list).toEqual(
+      publicAccess
+    )
+    expect(parseSettingsHeaderNavModules(undefined).price_list).toEqual(
+      publicAccess
+    )
+    expect(HEADER_NAV_DEFAULT.price_list).toEqual(publicAccess)
+  })
+
+  test('keeps a saved Price List access setting consistent', () => {
+    const serialized = JSON.stringify({
+      price_list: { enabled: false, requireAuth: true },
+    })
+    const savedAccess = { enabled: false, requireAuth: true }
+
+    expect(parseRuntimeHeaderNavModules(serialized).price_list).toEqual(
+      savedAccess
+    )
+    expect(parseSettingsHeaderNavModules(serialized).price_list).toEqual(
+      savedAccess
+    )
+  })
 })

@@ -35,6 +35,14 @@ type Model struct {
 	UpdatedTime  int64          `json:"updated_time" gorm:"bigint"`
 	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index;uniqueIndex:uk_model_name_delete_at,priority:2"`
 
+	// LG-02：模型广场分类与展示元数据（一级/二级怎么配就怎么展示）
+	CategoryL1  string `json:"category_l1,omitempty" gorm:"type:varchar(64);column:category_l1"`
+	CategoryL2  string `json:"category_l2,omitempty" gorm:"type:varchar(64);column:category_l2"`
+	PricingKind string `json:"pricing_kind,omitempty" gorm:"type:varchar(32);column:pricing_kind"` // text|multimodal|image|video|language|base
+	Resolution  string `json:"resolution,omitempty" gorm:"type:varchar(64)"`
+	Subtype     string `json:"subtype,omitempty" gorm:"type:varchar(64)"`
+	Dimension   string `json:"dimension,omitempty" gorm:"type:varchar(64)"`
+
 	BoundChannels []BoundChannel `json:"bound_channels,omitempty" gorm:"-"`
 	EnableGroups  []string       `json:"enable_groups,omitempty" gorm:"-"`
 	QuotaTypes    []int          `json:"quota_types,omitempty" gorm:"-"`
@@ -78,7 +86,8 @@ func (mi *Model) Update() error {
 	mi.UpdatedTime = common.GetTimestamp()
 	// 使用 Select 强制更新所有字段，包括零值
 	return DB.Model(&Model{}).Where("id = ?", mi.Id).
-		Select("model_name", "description", "icon", "tags", "vendor_id", "endpoints", "status", "sync_official", "name_rule", "updated_time").
+		Select("model_name", "description", "icon", "tags", "vendor_id", "endpoints", "status", "sync_official", "name_rule", "updated_time",
+			"category_l1", "category_l2", "pricing_kind", "resolution", "subtype", "dimension").
 		Updates(mi).Error
 }
 
