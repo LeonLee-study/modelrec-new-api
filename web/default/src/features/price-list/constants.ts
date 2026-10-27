@@ -57,12 +57,14 @@ export const PLACEHOLDER_STATS: PriceListStats = {
  */
 export const FILTER_SCHEME_CLASSES = {
   orange: {
-    active: 'border-transparent bg-[#FF8A00] text-white hover:bg-[#E67600]',
+    active:
+      '!border-transparent !bg-[#FF8A00] !text-white hover:!bg-[#E67600]',
     inactive:
       'border-[#e7e0d3] bg-white text-gray-700 hover:border-[#FF8A00] hover:text-[#FF8A00]',
   },
   green: {
-    active: 'border-transparent bg-[#007B43] text-white hover:bg-[#006536]',
+    active:
+      '!border-transparent !bg-[#007B43] !text-white hover:!bg-[#006536]',
     inactive:
       'border-[#e7e0d3] bg-white text-gray-700 hover:border-[#007B43] hover:text-[#007B43]',
   },
