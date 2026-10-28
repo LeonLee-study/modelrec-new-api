@@ -42,6 +42,7 @@ type User struct {
 	UsedQuota        int            `json:"used_quota" gorm:"type:int;default:0;column:used_quota"` // used quota
 	RequestCount     int            `json:"request_count" gorm:"type:int;default:0;"`               // request number
 	Group            string         `json:"group" gorm:"type:varchar(64);default:'default'"`
+	ModelAliasTag    string         `json:"model_alias_tag" gorm:"type:varchar(64);column:model_alias_tag;default:''"`
 	AffCode          string         `json:"aff_code" gorm:"type:varchar(32);column:aff_code;uniqueIndex"`
 	AffCount         int            `json:"aff_count" gorm:"type:int;default:0;column:aff_count"`
 	AffQuota         int            `json:"aff_quota" gorm:"type:int;default:0;column:aff_quota"`           // 邀请剩余额度
@@ -60,13 +61,14 @@ type User struct {
 
 func (user *User) ToBaseUser() *UserBase {
 	cache := &UserBase{
-		Id:       user.Id,
-		Group:    user.Group,
-		Quota:    user.Quota,
-		Status:   user.Status,
-		Username: user.Username,
-		Setting:  user.Setting,
-		Email:    user.Email,
+		Id:            user.Id,
+		Group:         user.Group,
+		Quota:         user.Quota,
+		Status:        user.Status,
+		Username:      user.Username,
+		Setting:       user.Setting,
+		Email:         user.Email,
+		ModelAliasTag: user.ModelAliasTag,
 	}
 	return cache
 }
@@ -532,11 +534,16 @@ func (user *User) Edit(updatePassword bool) error {
 	}
 
 	newUser := *user
+	newUser.ModelAliasTag = strings.TrimSpace(newUser.ModelAliasTag)
+	if len([]rune(newUser.ModelAliasTag)) > 64 {
+		return errors.New("model_alias_tag 长度不能超过 64")
+	}
 	updates := map[string]interface{}{
-		"username":     newUser.Username,
-		"display_name": newUser.DisplayName,
-		"group":        newUser.Group,
-		"remark":       newUser.Remark,
+		"username":        newUser.Username,
+		"display_name":    newUser.DisplayName,
+		"group":           newUser.Group,
+		"remark":          newUser.Remark,
+		"model_alias_tag": newUser.ModelAliasTag,
 	}
 	if updatePassword {
 		updates["password"] = newUser.Password
@@ -545,6 +552,16 @@ func (user *User) Edit(updatePassword bool) error {
 	DB.First(&user, user.Id)
 	if err = DB.Model(user).Updates(updates).Error; err != nil {
 		return err
+	}
+
+	// First() above reloads the previous DB row; apply edited fields before refresh cache.
+	user.Username = newUser.Username
+	user.DisplayName = newUser.DisplayName
+	user.Group = newUser.Group
+	user.Remark = newUser.Remark
+	user.ModelAliasTag = newUser.ModelAliasTag
+	if updatePassword {
+		user.Password = newUser.Password
 	}
 
 	// Update cache
