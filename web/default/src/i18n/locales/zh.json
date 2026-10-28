@@ -5291,6 +5291,22 @@
     "priceList.note.benchmarkLabel": "基准：",
     "priceList.note.benchmark": "内部锚定 ${{std_USD}}/1M Token（1 美元 = 50 万 Token），推导 1 燧点 = {{suidian_token}} Token 额度。",
     "priceList.note.settlementLabel": "结算：",
-    "priceList.note.settlement": "模型按官方原价折算燧点，燧点价 = 官方原价（$/1M） × {{pr_USD}} 结算。（会有不定期折扣，详情可关注公告）"
+    "priceList.note.settlement": "模型按官方原价折算燧点，燧点价 = 官方原价（$/1M） × {{pr_USD}} 结算。（会有不定期折扣，详情可关注公告）",
+    "Alias Mapping": "别名映射",
+    "Add Alias Mapping": "添加别名映射",
+    "Edit Alias Mapping": "编辑别名映射",
+    "Mapping Group": "映射组",
+    "No alias mappings yet. Click \"Add Alias Mapping\" to create one.": "暂无别名映射，点击\"添加别名映射\"创建。",
+    "Alias mapping deleted. Click \"Save Settings\" to apply.": "别名映射已删除，点击\"保存设置\"生效。",
+    "{{count}} alias mappings deleted. Click \"Save Settings\" to apply.": "已删除 {{count}} 条别名映射，点击\"保存设置\"生效。",
+    "Alias mapping updated. Click \"Save Settings\" to apply.": "别名映射已更新，点击\"保存设置\"生效。",
+    "Alias mapping added. Click \"Save Settings\" to apply.": "别名映射已添加，点击\"保存设置\"生效。",
+    "Alias mappings saved successfully": "别名映射保存成功",
+    "Failed to save alias mappings": "保存别名映射失败",
+    "Enter alias label": "请输入别名标签",
+    "Maximum 100 characters": "最多100个字符",
+    "Create or update alias mapping rules": "创建或更新别名映射规则",
+    "This alias mapping will be removed from the list.": "该别名映射将从列表中移除。",
+    "alias mappings will be removed from the list.": "条别名映射将从列表中移除。"
   }
 }

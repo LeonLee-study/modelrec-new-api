@@ -1,0 +1,15 @@
+{
+  "API Keys": "API Keys",
+  "docs.sdk.goDesc": "Go 语言官方社区 SDK。",
+  "docs.sidebar.apiReference": "API Reference",
+  "Est. ¥{{amount}}": "预计 ¥{{amount}}",
+  "JPG, PNG, BMP, or WebP · up to {{size}} MB · shortest edge ≥ {{edge}} px": "支持 JPG、PNG、BMP 或 WebP · 不超过 {{size}} MB · 最短边 ≥ {{edge}} px",
+  "priceList.category.vectorSub": "VECTOR & RETRIEVAL",
+  "priceList.rules.badge": "RULE {{number}}",
+  "priceList.rules.rule1.cny": "¥1 = {{value}} 燧点",
+  "priceList.rules.rule1.usd": "$1 = {{value}} 燧点",
+  "The image exceeds the {{size}} MB limit.": "图片超过 {{size}} MB 限制。",
+  "The shortest image edge must be at least {{edge}} px.": "图片最短边至少需要 {{edge}} px。",
+  "This is a list of all your API keys. API keys are only visible and copyable when created. Please save them properly. Do not share your API keys with others or expose them in browser or other client code. To protect your account security, we may automatically disable API keys that we find have been publicly leaked.": "列表内是你的全部 API Key，API Key 仅在创建时可见可复制，请妥善保存。不要与他人共享你的 API Key，或将其暴露在浏览器或其他客户端代码中。为了保护你的帐户安全，我们可能会自动禁用我们发现已公开泄露的 API Key。",
+  "Upload a JPG, PNG, BMP, or WebP image.": "请上传 JPG、PNG、BMP 或 WebP 图片。"
+}

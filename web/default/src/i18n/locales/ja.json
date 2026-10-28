@@ -5054,6 +5054,22 @@
     "priceList.note.benchmarkLabel": "Benchmark: ",
     "priceList.note.benchmark": "Internally anchored at ${{std_USD}}/1M tokens (1 USD = 500,000 tokens), yielding 1 suidian = {{suidian_token}} token credits.",
     "priceList.note.settlementLabel": "Settlement: ",
-    "priceList.note.settlement": "Models are settled at official price in suidian: suidian price = official price ($/1M) × {{pr_USD}}. (Occasional discounts may apply — see announcements for details.)"
+    "priceList.note.settlement": "Models are settled at official price in suidian: suidian price = official price ($/1M) × {{pr_USD}}. (Occasional discounts may apply — see announcements for details.)",
+    "Alias Mapping": "エイリアスマッピング",
+    "Add Alias Mapping": "エイリアスマッピングを追加",
+    "Edit Alias Mapping": "エイリアスマッピングを編集",
+    "Mapping Group": "マッピンググループ",
+    "No alias mappings yet. Click \"Add Alias Mapping\" to create one.": "エイリアスマッピングがありません。「エイリアスマッピングを追加」をクリックして作成してください。",
+    "Alias mapping deleted. Click \"Save Settings\" to apply.": "エイリアスマッピングを削除しました。「設定を保存」をクリックして適用してください。",
+    "{{count}} alias mappings deleted. Click \"Save Settings\" to apply.": "{{count}}件のエイリアスマッピングを削除しました。「設定を保存」をクリックして適用してください。",
+    "Alias mapping updated. Click \"Save Settings\" to apply.": "エイリアスマッピングを更新しました。「設定を保存」をクリックして適用してください。",
+    "Alias mapping added. Click \"Save Settings\" to apply.": "エイリアスマッピングを追加しました。「設定を保存」をクリックして適用してください。",
+    "Alias mappings saved successfully": "エイリアスマッピングが正常に保存されました",
+    "Failed to save alias mappings": "エイリアスマッピングの保存に失敗しました",
+    "Enter alias label": "エイリアスラベルを入力",
+    "Maximum 100 characters": "最大100文字",
+    "Create or update alias mapping rules": "エイリアスマッピングルールを作成または更新",
+    "This alias mapping will be removed from the list.": "このエイリアスマッピングはリストから削除されます。",
+    "alias mappings will be removed from the list.": "件のエイリアスマッピングがリストから削除されます。"
   }
 }
