@@ -101,6 +101,9 @@ export function UsersMutateDrawer({
 
   const groups = groupsData?.data || []
 
+  // Placeholder tag options — replace with API-fetched data later
+  const availableTags = ['Tag A', 'Tag B', 'Tag C']
+
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: USER_FORM_DEFAULT_VALUES,
@@ -271,6 +274,40 @@ export function UsersMutateDrawer({
                     )}
                   />
                 )}
+
+                <FormField
+                  control={form.control}
+                  name='tag'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Tag')}</FormLabel>
+                      <Select
+                        items={availableTags.map((tag) => ({
+                          value: tag,
+                          label: tag,
+                        }))}
+                        onValueChange={(value) => field.onChange(value ?? '')}
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('Select a tag')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            {availableTags.map((tag) => (
+                              <SelectItem key={tag} value={tag}>
+                                {tag}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

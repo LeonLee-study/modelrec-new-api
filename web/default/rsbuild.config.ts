@@ -19,8 +19,8 @@ export default defineConfig(({ envMode }) => {
 
   const isProd = envMode === "production";
   const devProxy = {
-    // TODO: temporary — route pricing to remote test server (avoids CORS)
-    "/api/pricing": { target: "http://47.121.128.119", changeOrigin: true },
+    // TODO: test proxy disabled — /api/pricing now routes to local backend via generic /api rule below
+    // "/api/pricing": { target: "http://47.121.128.119", changeOrigin: true },
     "/api/v2": { target: smsServiceUrl, changeOrigin: true },
     ...Object.fromEntries(
       (["/api", "/mj", "/pg"] as const).map((key) => [
