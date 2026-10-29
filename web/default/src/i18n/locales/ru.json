@@ -5070,6 +5070,11 @@
     "Maximum 100 characters": "Максимум 100 символов",
     "Create or update alias mapping rules": "Создать или обновить правила маппинга алиасов",
     "This alias mapping will be removed from the list.": "Этот маппинг алиасов будет удалён из списка.",
-    "alias mappings will be removed from the list.": "маппингов алиасов будет удалено из списка."
+    "alias mappings will be removed from the list.": "маппингов алиасов будет удалено из списка.",
+    "Original Name": "Исходное имя",
+    "Alias Name": "Имя алиаса",
+    "No mapping pairs": "Нет пар маппинга",
+    "Add mapping pair": "Добавить пару маппинга",
+    "Mapping Group Details": "Детали группы маппинга"
   }
 }

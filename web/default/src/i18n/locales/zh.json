@@ -5307,6 +5307,11 @@
     "Maximum 100 characters": "最多100个字符",
     "Create or update alias mapping rules": "创建或更新别名映射规则",
     "This alias mapping will be removed from the list.": "该别名映射将从列表中移除。",
-    "alias mappings will be removed from the list.": "条别名映射将从列表中移除。"
+    "alias mappings will be removed from the list.": "条别名映射将从列表中移除。",
+    "Original Name": "映射前原名",
+    "Alias Name": "映射后别名",
+    "No mapping pairs": "暂无映射对",
+    "Add mapping pair": "新增映射对",
+    "Mapping Group Details": "映射组详情"
   }
 }

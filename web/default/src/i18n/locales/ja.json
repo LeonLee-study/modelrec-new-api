@@ -5070,6 +5070,11 @@
     "Maximum 100 characters": "最大100文字",
     "Create or update alias mapping rules": "エイリアスマッピングルールを作成または更新",
     "This alias mapping will be removed from the list.": "このエイリアスマッピングはリストから削除されます。",
-    "alias mappings will be removed from the list.": "件のエイリアスマッピングがリストから削除されます。"
+    "alias mappings will be removed from the list.": "件のエイリアスマッピングがリストから削除されます。",
+    "Original Name": "元のモデル名",
+    "Alias Name": "エイリアス名",
+    "No mapping pairs": "マッピングペアがありません",
+    "Add mapping pair": "マッピングペアを追加",
+    "Mapping Group Details": "マッピンググループの詳細"
   }
 }

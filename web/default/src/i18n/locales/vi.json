@@ -5070,6 +5070,11 @@
     "Maximum 100 characters": "Tối đa 100 ký tự",
     "Create or update alias mapping rules": "Tạo hoặc cập nhật quy tắc ánh xạ bí danh",
     "This alias mapping will be removed from the list.": "Ánh xạ bí danh này sẽ bị xóa khỏi danh sách.",
-    "alias mappings will be removed from the list.": "ánh xạ bí danh sẽ bị xóa khỏi danh sách."
+    "alias mappings will be removed from the list.": "ánh xạ bí danh sẽ bị xóa khỏi danh sách.",
+    "Original Name": "Tên gốc",
+    "Alias Name": "Tên bí danh",
+    "No mapping pairs": "Không có cặp ánh xạ",
+    "Add mapping pair": "Thêm cặp ánh xạ",
+    "Mapping Group Details": "Chi tiết nhóm ánh xạ"
   }
 }

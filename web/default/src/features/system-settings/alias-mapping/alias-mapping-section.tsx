@@ -17,10 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useState } from 'react'
-import * as z from 'zod'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, Eye, Minus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
@@ -38,40 +36,42 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { StaticDataTable } from '@/components/data-table'
 import { Dialog } from '@/components/dialog'
 import { SettingsSwitchField } from '../components/settings-form-layout'
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
-import type { AliasMappingRule } from './types'
+import type { AliasMappingRule, MappingPair } from './types'
 
 type AliasMappingSectionProps = {
   enabled: boolean
   data: string
 }
 
-const aliasMappingSchema = z.object({
-  label: z
-    .string()
-    .min(1, 'Label is required')
-    .max(100, 'Label must be less than 100 characters'),
-  mappingGroup: z
-    .string()
-    .min(1, 'Mapping group is required')
-    .max(5000, 'Mapping group must be less than 5000 characters'),
-})
+type FormValues = { label: string }
 
-type AliasMappingFormValues = z.infer<typeof aliasMappingSchema>
+const FORM_ID = 'alias-mapping-form'
 
-const ALIAS_MAPPING_FORM_ID = 'alias-mapping-form'
+function parsePairs(raw: unknown): MappingPair[] {
+  if (!Array.isArray(raw)) return []
+  return raw.filter(
+    (item): item is MappingPair =>
+      Array.isArray(item) && item.length === 2
+  )
+}
+
+function formatMappingPreview(pairs: MappingPair[]): string {
+  if (pairs.length === 0) return '-'
+  const first = `"${pairs[0][0]}":"${pairs[0][1]}"`
+  if (pairs.length === 1) return first
+  return `${first}…`
+}
 
 export function AliasMappingSection({
   enabled,
@@ -79,22 +79,25 @@ export function AliasMappingSection({
 }: AliasMappingSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
+
   const [rules, setRules] = useState<AliasMappingRule[]>([])
   const [isEnabled, setIsEnabled] = useState(enabled)
   const [hasChanges, setHasChanges] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
-  const [showDialog, setShowDialog] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [editingRule, setEditingRule] = useState<AliasMappingRule | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>('single')
 
-  const form = useForm<AliasMappingFormValues>({
-    resolver: zodResolver(aliasMappingSchema),
-    defaultValues: {
-      label: '',
-      mappingGroup: '',
-    },
-  })
+  const [showFormDialog, setShowFormDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showViewDialog, setShowViewDialog] = useState(false)
+
+  const [editingRule, setEditingRule] = useState<AliasMappingRule | null>(null)
+  const [viewingRule, setViewingRule] = useState<AliasMappingRule | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<'single' | 'batch'>(
+    'single'
+  )
+
+  const [pairs, setPairs] = useState<MappingPair[]>([])
+
+  const form = useForm<FormValues>({ defaultValues: { label: '' } })
 
   useEffect(() => {
     try {
@@ -104,6 +107,7 @@ export function AliasMappingSection({
           parsed.map((item, idx) => ({
             ...item,
             id: item.id || idx + 1,
+            mappingGroup: parsePairs(item.mappingGroup),
           }))
         )
       }
@@ -129,22 +133,27 @@ export function AliasMappingSection({
     }
   }
 
-  const handleAdd = () => {
+  const openAddDialog = () => {
     setEditingRule(null)
-    form.reset({
-      label: '',
-      mappingGroup: '',
-    })
-    setShowDialog(true)
+    form.reset({ label: '' })
+    setPairs([['', '']])
+    setShowFormDialog(true)
   }
 
-  const handleEdit = (rule: AliasMappingRule) => {
+  const openEditDialog = (rule: AliasMappingRule) => {
     setEditingRule(rule)
-    form.reset({
-      label: rule.label,
-      mappingGroup: rule.mappingGroup,
-    })
-    setShowDialog(true)
+    form.reset({ label: rule.label })
+    setPairs(
+      rule.mappingGroup.length > 0
+        ? rule.mappingGroup.map((p) => [...p] as MappingPair)
+        : [['', '']]
+    )
+    setShowFormDialog(true)
+  }
+
+  const openViewDialog = (rule: AliasMappingRule) => {
+    setViewingRule(rule)
+    setShowViewDialog(true)
   }
 
   const handleDelete = (rule: AliasMappingRule) => {
@@ -178,9 +187,7 @@ export function AliasMappingSection({
       toast.success(
         t(
           '{{count}} alias mappings deleted. Click "Save Settings" to apply.',
-          {
-            count: selectedIds.length,
-          }
+          { count: selectedIds.length }
         )
       )
     }
@@ -188,11 +195,46 @@ export function AliasMappingSection({
     setEditingRule(null)
   }
 
-  const handleSubmitForm = (values: AliasMappingFormValues) => {
+  const addPairRow = () => {
+    setPairs((prev) => [...prev, ['', '']])
+  }
+
+  const removePairRow = (index: number) => {
+    setPairs((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const updatePairValue = (
+    index: number,
+    slot: 0 | 1,
+    value: string
+  ) => {
+    setPairs((prev) =>
+      prev.map((pair, i) => {
+        if (i !== index) return pair
+        const next = [...pair] as MappingPair
+        next[slot] = value
+        return next
+      })
+    )
+  }
+
+  const handleSubmitForm = (values: FormValues) => {
+    const label = values.label.trim()
+    if (!label) {
+      form.setError('label', { message: t('Label is required') })
+      return
+    }
+
+    const cleanedPairs = pairs.filter(
+      ([k, v]) => k.trim() !== '' && v.trim() !== ''
+    )
+
     if (editingRule) {
       setRules((prev) =>
         prev.map((item) =>
-          item.id === editingRule.id ? { ...item, ...values } : item
+          item.id === editingRule.id
+            ? { ...item, label, mappingGroup: cleanedPairs }
+            : item
         )
       )
       toast.success(
@@ -200,13 +242,16 @@ export function AliasMappingSection({
       )
     } else {
       const newId = Math.max(...rules.map((item) => item.id), 0) + 1
-      setRules((prev) => [...prev, { id: newId, ...values }])
+      setRules((prev) => [
+        ...prev,
+        { id: newId, label, mappingGroup: cleanedPairs },
+      ])
       toast.success(
         t('Alias mapping added. Click "Save Settings" to apply.')
       )
     }
     setHasChanges(true)
-    setShowDialog(false)
+    setShowFormDialog(false)
   }
 
   const handleSaveAll = async () => {
@@ -237,7 +282,7 @@ export function AliasMappingSection({
       <div className='space-y-4'>
         <div className='flex flex-wrap items-center justify-between gap-2'>
           <div className='flex flex-wrap items-center gap-2'>
-            <Button onClick={handleAdd} size='sm'>
+            <Button onClick={openAddDialog} size='sm'>
               <Plus className='mr-2 h-4 w-4' />
               {t('Add Alias Mapping')}
             </Button>
@@ -305,8 +350,25 @@ export function AliasMappingSection({
             {
               id: 'mapping-group',
               header: t('Mapping Group'),
-              cellClassName: 'text-muted-foreground max-w-md truncate',
-              cell: (rule) => rule.mappingGroup,
+              cellClassName: 'max-w-md',
+              cell: (rule) => (
+                <div className='flex items-center gap-2'>
+                  <span className='text-muted-foreground truncate'>
+                    {formatMappingPreview(rule.mappingGroup)}
+                  </span>
+                  {rule.mappingGroup.length > 0 && (
+                    <Button
+                      onClick={() => openViewDialog(rule)}
+                      size='sm'
+                      variant='outline'
+                      className='shrink-0'
+                    >
+                      <Eye className='mr-1 h-3 w-3' />
+                      {t('View')}
+                    </Button>
+                  )}
+                </div>
+              ),
             },
             {
               id: 'actions',
@@ -315,7 +377,7 @@ export function AliasMappingSection({
               cell: (rule) => (
                 <div className='flex gap-2'>
                   <Button
-                    onClick={() => handleEdit(rule)}
+                    onClick={() => openEditDialog(rule)}
                     size='sm'
                     variant='ghost'
                   >
@@ -336,8 +398,58 @@ export function AliasMappingSection({
       </div>
 
       <Dialog
-        open={showDialog}
-        onOpenChange={setShowDialog}
+        open={showViewDialog}
+        onOpenChange={setShowViewDialog}
+        title={t('Mapping Group Details')}
+        description={viewingRule?.label ?? ''}
+        contentClassName='max-w-2xl'
+        contentHeight='auto'
+        bodyClassName='space-y-3'
+        footer={
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => setShowViewDialog(false)}
+          >
+            {t('Close')}
+          </Button>
+        }
+      >
+        {viewingRule && (
+          <div className='space-y-3'>
+            <div>
+              <span className='text-muted-foreground text-sm'>
+                {t('Label')}:{' '}
+              </span>
+              <span className='text-sm font-medium'>
+                {viewingRule.label}
+              </span>
+            </div>
+            {viewingRule.mappingGroup.length > 0 ? (
+              <div className='space-y-2'>
+                {viewingRule.mappingGroup.map(([original, alias], idx) => (
+                  <div
+                    key={idx}
+                    className='flex items-center gap-2'
+                  >
+                    <Input value={original} disabled className='flex-1' />
+                    <span className='text-muted-foreground'>→</span>
+                    <Input value={alias} disabled className='flex-1' />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className='text-muted-foreground text-sm'>
+                {t('No mapping pairs')}
+              </p>
+            )}
+          </div>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={showFormDialog}
+        onOpenChange={setShowFormDialog}
         title={
           editingRule ? t('Edit Alias Mapping') : t('Add Alias Mapping')
         }
@@ -350,11 +462,11 @@ export function AliasMappingSection({
             <Button
               type='button'
               variant='outline'
-              onClick={() => setShowDialog(false)}
+              onClick={() => setShowFormDialog(false)}
             >
               {t('Cancel')}
             </Button>
-            <Button type='submit' form={ALIAS_MAPPING_FORM_ID}>
+            <Button type='submit' form={FORM_ID}>
               {editingRule ? t('Update') : t('Add')}
             </Button>
           </>
@@ -362,7 +474,7 @@ export function AliasMappingSection({
       >
         <Form {...form}>
           <form
-            id={ALIAS_MAPPING_FORM_ID}
+            id={FORM_ID}
             onSubmit={form.handleSubmit(handleSubmitForm)}
             className='space-y-4'
           >
@@ -378,37 +490,66 @@ export function AliasMappingSection({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t('Maximum 100 characters')}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='mappingGroup'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Mapping Group')}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t(
-                        'Enter mapping group as JSON, e.g. {"model_a": "model_b"}'
-                      )}
-                      rows={16}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t(
-                      'Maximum 5000 characters. JSON format for model alias mapping.'
-                    )}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <FormLabel>{t('Mapping Group')}</FormLabel>
+                <Button
+                  type='button'
+                  onClick={addPairRow}
+                  size='sm'
+                  variant='outline'
+                >
+                  <Plus className='mr-1 h-3 w-3' />
+                  {t('Add mapping pair')}
+                </Button>
+              </div>
+              <div className='space-y-2 rounded-md border p-3'>
+                {pairs.length > 0 ? (
+                  pairs.map(([original, alias], idx) => (
+                    <div
+                      key={idx}
+                      className='flex items-center gap-2'
+                    >
+                      <Input
+                        value={original}
+                        onChange={(e) =>
+                          updatePairValue(idx, 0, e.target.value)
+                        }
+                        placeholder={t('Original Name')}
+                        className='flex-1'
+                      />
+                      <span className='text-muted-foreground'>→</span>
+                      <Input
+                        value={alias}
+                        onChange={(e) =>
+                          updatePairValue(idx, 1, e.target.value)
+                        }
+                        placeholder={t('Alias Name')}
+                        className='flex-1'
+                      />
+                      <Button
+                        type='button'
+                        onClick={() => removePairRow(idx)}
+                        size='sm'
+                        variant='ghost'
+                        className='shrink-0'
+                      >
+                        <Minus className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className='text-muted-foreground py-2 text-center text-sm'>
+                    {t('No mapping pairs')}
+                  </p>
+                )}
+              </div>
+            </div>
           </form>
         </Form>
       </Dialog>

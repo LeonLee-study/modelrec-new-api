@@ -5219,6 +5219,11 @@
     "Maximum 100 characters": "Maximum 100 characters",
     "Create or update alias mapping rules": "Create or update alias mapping rules",
     "This alias mapping will be removed from the list.": "This alias mapping will be removed from the list.",
-    "alias mappings will be removed from the list.": "alias mappings will be removed from the list."
+    "alias mappings will be removed from the list.": "alias mappings will be removed from the list.",
+    "Original Name": "Original Name",
+    "Alias Name": "Alias Name",
+    "No mapping pairs": "No mapping pairs",
+    "Add mapping pair": "Add mapping pair",
+    "Mapping Group Details": "Mapping Group Details"
   }
 }

@@ -17,10 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
+export type MappingPair = [string, string]
+
 export type AliasMappingRule = {
   id: number
   label: string
-  mappingGroup: string
+  mappingGroup: MappingPair[]
 }
 
 export type AliasMappingSettings = {
