@@ -27,7 +27,7 @@ const ALIAS_MAPPING_SECTIONS = [
     build: (settings: AliasMappingSettings) => (
       <AliasMappingSection
         enabled={settings['alias_mapping_setting.enabled']}
-        data={settings['alias_mapping_setting.data']}
+        data={settings.ModelAliasMap}
       />
     ),
   },

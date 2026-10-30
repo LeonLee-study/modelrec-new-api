@@ -25,7 +25,7 @@ import {
 } from './section-registry.tsx'
 
 const defaultAliasMappingSettings: AliasMappingSettings = {
-  'alias_mapping_setting.data': '[]',
+  ModelAliasMap: '{}',
   'alias_mapping_setting.enabled': true,
 }
 

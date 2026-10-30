@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -88,7 +88,7 @@ export function UsersMutateDrawer({
 }: UsersMutateDrawerProps) {
   const { t } = useTranslation()
   const isUpdate = !!currentRow
-  const { triggerRefresh } = useUsers()
+  const { triggerRefresh, aliasMap } = useUsers()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [quotaDialogOpen, setQuotaDialogOpen] = useState(false)
 
@@ -101,13 +101,17 @@ export function UsersMutateDrawer({
 
   const groups = groupsData?.data || []
 
-  // Placeholder tag options — replace with API-fetched data later
-  const availableTags = ['Tag A', 'Tag B', 'Tag C']
-
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: USER_FORM_DEFAULT_VALUES,
   })
+
+  const observedTag = form.watch('model_alias_tag')
+  const tagOptions = useMemo(() => {
+    const tag = observedTag?.trim() || ''
+    if (!tag || aliasMap.includes(tag)) return aliasMap
+    return [...aliasMap, tag]
+  }, [aliasMap, observedTag])
 
   // Load existing data when updating
   useEffect(() => {
@@ -277,12 +281,12 @@ export function UsersMutateDrawer({
 
                 <FormField
                   control={form.control}
-                  name='tag'
+                  name='model_alias_tag'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('Tag')}</FormLabel>
                       <Select
-                        items={availableTags.map((tag) => ({
+                        items={tagOptions.map((tag) => ({
                           value: tag,
                           label: tag,
                         }))}
@@ -296,7 +300,7 @@ export function UsersMutateDrawer({
                         </FormControl>
                         <SelectContent alignItemWithTrigger={false}>
                           <SelectGroup>
-                            {availableTags.map((tag) => (
+                            {tagOptions.map((tag) => (
                               <SelectItem key={tag} value={tag}>
                                 {tag}
                               </SelectItem>

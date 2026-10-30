@@ -268,10 +268,10 @@ export function useUsersColumns(): ColumnDef<User>[] {
       size: 120,
     },
     {
-      accessorKey: 'tag',
+      accessorKey: 'model_alias_tag',
       header: t('Tag'),
       cell: ({ row }) => {
-        const tag = row.getValue('tag') as string | undefined
+        const tag = row.getValue('model_alias_tag') as string | undefined
         if (!tag) {
           return <span className='text-muted-foreground text-sm'>-</span>
         }

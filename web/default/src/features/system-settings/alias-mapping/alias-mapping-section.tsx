@@ -58,12 +58,51 @@ type FormValues = { label: string }
 
 const FORM_ID = 'alias-mapping-form'
 
-function parsePairs(raw: unknown): MappingPair[] {
-  if (!Array.isArray(raw)) return []
-  return raw.filter(
-    (item): item is MappingPair =>
-      Array.isArray(item) && item.length === 2
+type AliasMap = Record<string, Record<string, string>>
+
+function objectToPairs(mappings: unknown): MappingPair[] {
+  if (!mappings || typeof mappings !== 'object' || Array.isArray(mappings)) {
+    return []
+  }
+  return Object.entries(mappings as Record<string, string>).map(
+    ([original, alias]) => [original, alias] as MappingPair
   )
+}
+
+function parseAliasMap(raw: string): AliasMappingRule[] {
+  let map: AliasMap = {}
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      map = parsed as AliasMap
+    }
+  } catch {
+    map = {}
+  }
+
+  return Object.entries(map).map(([label, mappings], idx) => ({
+    id: idx + 1,
+    label,
+    mappingGroup: objectToPairs(mappings),
+  }))
+}
+
+function buildAliasMap(rules: AliasMappingRule[]): AliasMap {
+  const map: AliasMap = {}
+  for (const rule of rules) {
+    const label = rule.label.trim()
+    if (!label) continue
+    const inner: Record<string, string> = {}
+    for (const [original, alias] of rule.mappingGroup) {
+      const originalName = original.trim()
+      const aliasName = alias.trim()
+      if (originalName !== '' && aliasName !== '') {
+        inner[originalName] = aliasName
+      }
+    }
+    map[label] = inner
+  }
+  return map
 }
 
 function formatMappingPreview(pairs: MappingPair[]): string {
@@ -100,20 +139,7 @@ export function AliasMappingSection({
   const form = useForm<FormValues>({ defaultValues: { label: '' } })
 
   useEffect(() => {
-    try {
-      const parsed = JSON.parse(data || '[]')
-      if (Array.isArray(parsed)) {
-        setRules(
-          parsed.map((item, idx) => ({
-            ...item,
-            id: item.id || idx + 1,
-            mappingGroup: parsePairs(item.mappingGroup),
-          }))
-        )
-      }
-    } catch {
-      setRules([])
-    }
+    setRules(parseAliasMap(data))
   }, [data])
 
   useEffect(() => {
@@ -257,8 +283,8 @@ export function AliasMappingSection({
   const handleSaveAll = async () => {
     try {
       await updateOption.mutateAsync({
-        key: 'alias_mapping_setting.data',
-        value: JSON.stringify(rules),
+        key: 'ModelAliasMap',
+        value: JSON.stringify(buildAliasMap(rules)),
       })
       setHasChanges(false)
       toast.success(t('Alias mappings saved successfully'))

@@ -26,6 +26,6 @@ export type AliasMappingRule = {
 }
 
 export type AliasMappingSettings = {
-  'alias_mapping_setting.data': string
+  ModelAliasMap: string
   'alias_mapping_setting.enabled': boolean
 }
