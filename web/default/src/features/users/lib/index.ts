@@ -31,3 +31,8 @@ export {
   transformFormDataToPayload,
   transformUserToFormDefaults,
 } from './user-form'
+
+// ============================================================================
+// Model Alias Map Utilities
+// ============================================================================
+export { extractModelAliasMapKeys } from './model-alias'

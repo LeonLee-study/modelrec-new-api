@@ -268,6 +268,24 @@ export function useUsersColumns(): ColumnDef<User>[] {
       size: 120,
     },
     {
+      accessorKey: 'model_alias_tag',
+      header: t('Tag'),
+      cell: ({ row }) => {
+        const tag = row.getValue('model_alias_tag') as string | undefined
+        if (!tag) {
+          return <span className='text-muted-foreground text-sm'>-</span>
+        }
+        return (
+          <BadgeCell>
+            <StatusBadge label={tag} variant='neutral' copyable={false} />
+          </BadgeCell>
+        )
+      },
+      size: 120,
+      enableSorting: false,
+      meta: { mobileHidden: true },
+    },
+    {
       id: 'invite_info',
       header: t('Invite Info'),
       cell: ({ row }) => {
