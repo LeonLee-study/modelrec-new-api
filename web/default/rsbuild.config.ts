@@ -11,7 +11,8 @@ export default defineConfig(({ envMode }) => {
   const serverUrl =
     process.env.VITE_REACT_APP_SERVER_URL ||
     env.rawPublicVars.VITE_REACT_APP_SERVER_URL ||
-    "http://localhost:3000";
+    "http://localhost:3000"; // 默认后端地址 — 暂时注释
+    //"http://172.16.30.177:3000"; // 临时使用的后端地址
 
   //  新增：SMS 服务地址
   const smsServiceUrl =
