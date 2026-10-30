@@ -68,7 +68,7 @@ export function transformFormDataToPayload(
     username: data.username,
     display_name: data.display_name || data.username,
     password: data.password || undefined,
-    model_alias_tag: data.model_alias_tag || undefined,
+    model_alias_tag: data.model_alias_tag ?? '',
   }
 
   // For create: only send required fields

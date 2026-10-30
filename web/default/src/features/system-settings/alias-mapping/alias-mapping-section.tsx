@@ -44,7 +44,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { StaticDataTable } from '@/components/data-table'
 import { Dialog } from '@/components/dialog'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+// import { SettingsSwitchField } from '../components/settings-form-layout' /* Enabled toggle hidden — kept for restoration */
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
 import type { AliasMappingRule, MappingPair } from './types'
@@ -332,12 +332,14 @@ export function AliasMappingSection({
               {updateOption.isPending ? t('Saving...') : t('Save Settings')}
             </Button>
           </div>
+          {/* Enabled toggle hidden — kept for restoration
           <SettingsSwitchField
             checked={isEnabled}
             onCheckedChange={handleToggleEnabled}
             label={t('Enabled')}
             className='py-0'
           />
+          */}
         </div>
 
         <StaticDataTable

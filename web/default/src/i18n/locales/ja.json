@@ -5076,6 +5076,7 @@
     "No mapping pairs": "マッピングペアがありません",
     "Add mapping pair": "マッピングペアを追加",
     "Mapping Group Details": "マッピンググループの詳細",
-    "Select a tag": "タグを選択"
+    "Select a tag": "タグを選択",
+    "No tag": "タグなし"
   }
 }
