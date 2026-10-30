@@ -286,12 +286,23 @@ export function UsersMutateDrawer({
                     <FormItem>
                       <FormLabel>{t('Tag')}</FormLabel>
                       <Select
-                        items={tagOptions.map((tag) => ({
-                          value: tag,
-                          label: tag,
-                        }))}
-                        onValueChange={(value) => field.onChange(value ?? '')}
-                        value={field.value || ''}
+                        items={[
+                          { value: '__NO_TAG__', label: t('No tag') },
+                          ...tagOptions.map((tag) => ({
+                            value: tag,
+                            label: tag,
+                          })),
+                        ]}
+                        onValueChange={(value) =>
+                          field.onChange(
+                            value === '__NO_TAG__' ? '' : (value ?? '')
+                          )
+                        }
+                        value={
+                          field.value === '' || !field.value
+                            ? '__NO_TAG__'
+                            : field.value
+                        }
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -300,6 +311,9 @@ export function UsersMutateDrawer({
                         </FormControl>
                         <SelectContent alignItemWithTrigger={false}>
                           <SelectGroup>
+                            <SelectItem value='__NO_TAG__'>
+                              {t('No tag')}
+                            </SelectItem>
                             {tagOptions.map((tag) => (
                               <SelectItem key={tag} value={tag}>
                                 {tag}
