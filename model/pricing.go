@@ -38,7 +38,7 @@ type Pricing struct {
 	BillingExpr            string                  `json:"billing_expr,omitempty"`
 	PricingVersion         string                  `json:"pricing_version,omitempty"`
 
-	// LG-02：类别 + 官方价/燧点价合表字段（按 pricing_kind 填充）
+	// LG-02：类别 + 官方价/积分价合表字段（按 pricing_kind 填充；JSON 键仍为 suidian_*）
 	CategoryL1             string   `json:"category_l1,omitempty"`
 	CategoryL2             string   `json:"category_l2,omitempty"`
 	PricingKind            string   `json:"pricing_kind,omitempty"`
