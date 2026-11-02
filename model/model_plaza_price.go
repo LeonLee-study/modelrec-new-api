@@ -10,16 +10,20 @@ import (
 	"github.com/QuantumNous/new-api/setting/ratio_setting"
 )
 
+// 计价单位文案：积分（现行）；兼容历史「燧点/遂点」。
+const plazaPriceUnit = `(?:积分|燧点|遂点)`
+
 var (
 	rePlazaTokenIO = regexp.MustCompile(
-		`(?i)输入\s*燧点\s*([\d,]+(?:\.\d+)?)\s*/\s*1M\s*[·•.\s]*输出\s*燧点\s*([\d,]+(?:\.\d+)?)\s*/\s*1M`,
+		`(?i)输入\s*` + plazaPriceUnit + `\s*([\d,]+(?:\.\d+)?)\s*/\s*1M\s*[·•.\s]*输出\s*` + plazaPriceUnit + `\s*([\d,]+(?:\.\d+)?)\s*/\s*1M`,
 	)
-	rePlazaPerRequest = regexp.MustCompile(`(?i)燧点\s*([\d,]+(?:\.\d+)?)\s*/\s*请求`)
+	rePlazaPerRequest = regexp.MustCompile(`(?i)` + plazaPriceUnit + `\s*([\d,]+(?:\.\d+)?)\s*/\s*请求`)
 )
 
 // ParsedPlazaPrice 由分类表「模型价格」反解出的广场计费参数。
-// Token 口径：官方 USD/1M = 燧点/7000，model_ratio = 官方 USD / $2。
-// 按次口径：ModelPrice（USD）= 燧点/7000，列表官方单价同源。
+// Token 口径：官方 USD/1M = 积分/PointsPerUSD，model_ratio = 官方 USD / $2。
+// 按次口径：ModelPrice（USD）= 积分/PointsPerUSD，列表官方单价同源。
+// InputSuidian1M 等字段名为历史兼容，存的是积分数量。
 type ParsedPlazaPrice struct {
 	UsePrice         bool
 	ModelRatio       float64
@@ -93,7 +97,7 @@ func ParsePlazaPriceText(priceText string) (*ParsedPlazaPrice, error) {
 }
 
 // SyncModelPlazaPrices 按分类表价格写入 ModelRatio / CompletionRatio / ModelPrice，
-// 使 /api/pricing 官方价与分类表燧点价（÷7000）一致。
+// 使 /api/pricing 官方价与分类表积分价（÷PointsPerUSD）一致。
 func SyncModelPlazaPrices(records []ModelCategoryRecord) (*ModelPlazaPriceSyncResult, error) {
 	ratios := ratio_setting.GetModelRatioCopy()
 	if ratios == nil {
