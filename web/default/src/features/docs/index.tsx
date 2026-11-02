@@ -635,10 +635,12 @@ curl --request GET 'https://modelrec.net/v1/video/generations/task_pBKdi10NNqFCC
           </pre>
         </div>
 
-        {/* TextToSpeech */}
+        {/* SpeechModel */}
         <h3 className="mb-3 mt-8 text-base font-semibold tracking-tight">
-          {t("docs.apiRef.textToSpeech")}
+          {t("docs.apiRef.speechModel")}
         </h3>
+        {/* SpeechModel - API_Table */}
+        
         <div
           className="mt-0 overflow-hidden rounded-lg border shadow-sm"
           style={{
@@ -681,48 +683,9 @@ curl --request GET 'https://modelrec.net/v1/video/generations/task_pBKdi10NNqFCC
     "response_format": "mp3",
     "speed": 1
   }' \\
-  --output speech.mp3`}
-            </code>
-          </pre>
-        </div>
+  --output speech.mp3
 
-        {/* SpeechToText */}
-        <h3 className="mb-3 mt-8 text-base font-semibold tracking-tight">
-          {t("docs.apiRef.speechToText")}
-        </h3>
-        <div
-          className="mt-0 overflow-hidden rounded-lg border shadow-sm"
-          style={{
-            backgroundColor: "#1a1f2c",
-            borderColor: "rgba(255,255,255,0.08)",
-          }}
-        >
-          <div
-            className="flex items-center gap-2 border-b px-4 py-2.5"
-            style={{
-              backgroundColor: "#232937",
-              borderColor: "rgba(255,255,255,0.08)",
-            }}
-          >
-            <span
-              className="rounded-md px-3 py-1 text-xs font-medium"
-              style={{
-                backgroundColor: "rgba(5,191,6,0)",
-                color: "rgb(0 188 114)",
-              }}
-            >
-              cURL
-            </span>
-            <span className="text-xs" style={{ color: "#9aa5b8" }}>
-              v1/audio/transcriptions
-            </span>
-          </div>
-          <pre
-            className="overflow-x-auto p-5 text-sm leading-relaxed"
-            style={{ backgroundColor: "#1a1f2c", color: "#dce3ef" }}
-          >
-            <code style={{ color: "#dce3ef" }}>
-              {`curl --request POST 'https://modelrec.net/v1/audio/transcriptions' \\
+curl --request POST 'https://modelrec.net/v1/audio/transcriptions' \\
   --header 'Authorization: Bearer sk-xxx' \\
   --form 'file=@"/path/to/audio.mp3"' \\
   --form 'model="whisper-1"' \\

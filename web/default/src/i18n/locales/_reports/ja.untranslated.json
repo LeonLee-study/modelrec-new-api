@@ -46,6 +46,7 @@
   "docs.apiRef.imageToVideo": "Image to Video",
   "docs.apiRef.textToSpeech": "Text to speech",
   "docs.apiRef.speechToText": "Speech to Text",
+  "docs.apiRef.speechModel": "Speech Model",
   "docs.apiRef.title": "API Reference",
   "docs.faq.q1.a": "After registration, a small amount of trial credits is automatically granted. You can check your balance on the Wallet page after login. You may also contact the admin for additional test credits. Alipay online top-up is supported for purchasing credits as needed.",
   "docs.faq.q1.q": "How do new users get trial credits?",

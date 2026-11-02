@@ -30,8 +30,8 @@ function toCountDisplay(count: unknown, fallback: string): string {
   if (typeof count !== 'number' && typeof count !== 'string') return fallback
   const n = Math.trunc(Number(count))
   if (!Number.isFinite(n) || n < 0) return fallback
-  if (n < 10) return String(n)
-  return `${Math.floor(n / 10) * 10}+`
+  if (n > 10) return  `${Math.floor(n / 10) * 10}+`
+  return String(n)
 }
 
 export function Stats() {

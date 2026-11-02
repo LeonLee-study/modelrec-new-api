@@ -5067,6 +5067,7 @@
     "docs.apiRef.imageToVideo": "图生视频",
     "docs.apiRef.textToSpeech": "语音合成",
     "docs.apiRef.speechToText": "语音识别",
+    "docs.apiRef.speechModel": "语音模型",
     "docs.sdk.pythonDesc": "官方 Python SDK，支持同步和异步调用。",
     "docs.sdk.nodeDesc": "适用于 Node.js / 浏览器的 JavaScript SDK。",
     "docs.sdk.goDesc": "Go 语言官方社区 SDK。",
