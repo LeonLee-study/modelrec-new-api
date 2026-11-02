@@ -28,13 +28,13 @@ For commercial licensing, please contact support@quantumnous.com
  * different value source at its call site.
  */
 export type PricingRuleValues = {
-  /** 充值汇率：1 人民币可兑换的燧点数 */
+  /** 充值汇率：1 人民币可兑换的积分数 */
   pr_CNY: number
-  /** 充值汇率：1 美元可兑换的燧点数 */
+  /** 充值汇率：1 美元可兑换的积分数 */
   pr_USD: number
   /** 内部基准价：1M Token 对应的美元基准价 */
   std_USD: number
-  /** 换算锚点：1 燧点对应的 Token 额度 */
+  /** 换算锚点：1 积分对应的 Token 额度 */
   suidian_token: number
   /** 美元对人民币的固定折算汇率，用于 RULE 01 注解中的「1：N」 */
   cost_rate: number
