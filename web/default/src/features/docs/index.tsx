@@ -470,6 +470,25 @@ function FirstConversationSection() {
 function ApiReferenceSection() {
   const { t } = useTranslation();
 
+  const speechParams = [
+    { name: "Authorization", type: "Header", required: true, desc: "Bearer API Key" },
+    { name: "model", type: "string", required: true, desc: "模型名，如 tts-1" },
+    { name: "input", type: "string", required: true, desc: "要合成的文本" },
+    {
+      name: "voice",
+      type: "string",
+      required: true,
+      desc: "alloy / echo / fable / onyx / nova / shimmer",
+    },
+    {
+      name: "response_format",
+      type: "string",
+      required: false,
+      desc: "mp3 / opus / aac / flac / wav / pcm，默认 mp3",
+    },
+    { name: "speed", type: "number", required: false, desc: "0.25–4.0，默认 1" },
+  ];
+
   return (
     <section id="api-reference" className="scroll-mt-24">
       <AnimateInView animation="fade-up">
@@ -640,6 +659,112 @@ curl --request GET 'https://modelrec.net/v1/video/generations/task_pBKdi10NNqFCC
           {t("docs.apiRef.speechModel")}
         </h3>
         {/* SpeechModel - API_Table */}
+        <div
+          className="mt-4 mb-3 overflow-hidden rounded-lg border shadow-sm"
+          style={{
+            backgroundColor: "#1a1f2c",
+            borderColor: "rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            className="flex items-center gap-2 border-b px-4 py-2.5"
+            style={{
+              backgroundColor: "#232937",
+              borderColor: "rgba(255,255,255,0.08)",
+            }}
+          >
+            <span
+              className="rounded-md px-3 py-1 text-xs font-medium"
+              style={{
+                backgroundColor: "rgba(5,191,6,0)",
+                color: "rgb(0 188 114)",
+              }}
+            >
+              参数
+            </span>
+            <span className="text-xs" style={{ color: "#9aa5b8" }}>
+              请求参数说明
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm leading-relaxed">
+              <thead>
+                <tr style={{ backgroundColor: "#232937" }}>
+                  <th
+                    className="px-4 py-3 text-left font-medium"
+                    style={{ color: "#9aa5b8" }}
+                  >
+                    参数名
+                  </th>
+                  <th
+                    className="px-4 py-3 text-left font-medium"
+                    style={{ color: "#9aa5b8" }}
+                  >
+                    类型
+                  </th>
+                  <th
+                    className="px-4 py-3 text-left font-medium"
+                    style={{ color: "#9aa5b8" }}
+                  >
+                    必填
+                  </th>
+                  <th
+                    className="px-4 py-3 text-left font-medium"
+                    style={{ color: "#9aa5b8" }}
+                  >
+                    说明
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {speechParams.map((param) => (
+                  <tr
+                    key={param.name}
+                    className="border-t"
+                    style={{ borderColor: "rgba(255,255,255,0.08)" }}
+                  >
+                    <td
+                      className="px-4 py-3 font-mono text-xs"
+                      style={{ color: "#dce3ef" }}
+                    >
+                      {param.name}
+                    </td>
+                    <td
+                      className="px-4 py-3 font-mono text-xs"
+                      style={{ color: "#dce3ef" }}
+                    >
+                      {param.type}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="rounded-md px-2 py-0.5 text-xs font-medium"
+                        style={
+                          param.required
+                            ? {
+                                backgroundColor: "rgba(0,188,114,0.15)",
+                                color: "rgb(0 188 114)",
+                              }
+                            : {
+                                backgroundColor: "rgba(154,165,184,0.15)",
+                                color: "#9aa5b8",
+                              }
+                        }
+                      >
+                        {param.required ? "是" : "否"}
+                      </span>
+                    </td>
+                    <td
+                      className="px-4 py-3 text-xs"
+                      style={{ color: "#dce3ef" }}
+                    >
+                      {param.desc}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
         
         <div
           className="mt-0 overflow-hidden rounded-lg border shadow-sm"
