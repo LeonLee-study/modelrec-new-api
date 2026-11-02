@@ -3,8 +3,8 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
-
 	"sync"
 	"time"
 
@@ -118,6 +118,30 @@ func GetVendors() []PricingVendor {
 		GetPricing()
 	}
 	return vendorsList
+}
+
+// GetPlazaHomeStats 返回首页用的模型广场同源统计：启用模型数、有厂商的去重提供者数。
+func GetPlazaHomeStats() (modelCount int, providerCount int) {
+	pricing := GetPricing()
+	modelCount = len(pricing)
+	vendors := make(map[int]struct{}, len(pricing))
+	for _, item := range pricing {
+		if item.VendorID > 0 {
+			vendors[item.VendorID] = struct{}{}
+		}
+	}
+	return modelCount, len(vendors)
+}
+
+// FormatHomeStatCount 首页模型/提供者展示：小于等于 10 显示原值；大于 10 向下取整十并加 "+"。
+func FormatHomeStatCount(n int) string {
+	if n < 0 {
+		n = 0
+	}
+	if n <= 10 {
+		return strconv.Itoa(n)
+	}
+	return strconv.Itoa((n/10)*10) + "+"
 }
 
 func GetModelSupportEndpointTypes(model string) []constant.EndpointType {

@@ -40,6 +40,8 @@ func TestStatus(c *gin.Context) {
 }
 
 func GetStatus(c *gin.Context) {
+	// 首页模型/提供者统计与模型广场同源；在 OptionMap 锁外计算，避免与定价缓存争锁。
+	homeModelCount, homeProviderCount := model.GetPlazaHomeStats()
 
 	cs := console_setting.GetConsoleSetting()
 	common.OptionMapRWMutex.RLock()
@@ -129,6 +131,12 @@ func GetStatus(c *gin.Context) {
 		"user_agreement_enabled":      legalSetting.UserAgreement != "",
 		"privacy_policy_enabled":      legalSetting.PrivacyPolicy != "",
 		"checkin_enabled":             operation_setting.GetCheckinSetting().Enabled,
+
+		// 首页统计：模型广场真实数量 + 展示文案（≤10 原值；>10 整十+）
+		"home_model_count":            homeModelCount,
+		"home_model_count_display":    model.FormatHomeStatCount(homeModelCount),
+		"home_provider_count":         homeProviderCount,
+		"home_provider_count_display": model.FormatHomeStatCount(homeProviderCount),
 	}
 
 	// 根据启用状态注入可选内容
