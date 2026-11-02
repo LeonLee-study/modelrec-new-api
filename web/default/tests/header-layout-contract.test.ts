@@ -43,8 +43,11 @@ describe('header layout contract', () => {
     expect(hero).not.toContain('// import { Stats }')
     expect(hero).not.toContain('{/* <Stats /> */}')
     expect(hero).not.toContain('<highlight>400+</highlight>')
-    expect(stats).toContain("{ value: '400+', label: 'Models'")
-    expect(stats).toContain("{ value: '60+', label: 'Providers'")
+    expect(stats).toContain('home_model_count')
+    expect(stats).toContain('home_provider_count')
+    expect(stats).toContain("'400+'")
+    expect(stats).toContain("'60+'")
+    expect(stats).toContain('useStatus')
     expect(stats).toContain("// { value: '8M+', label: 'Global Users'")
     expect(stats).toContain("// { value: '100T', label: 'Monthly Tokens'")
   })
@@ -95,11 +98,9 @@ describe('header layout contract', () => {
       'flex items-center gap-0 text-xl font-bold tracking-tight'
     )
     expect(systemBrand).toContain(
-      'inline-flex h-7 items-center gap-0 rounded-md'
+      'flex shrink-0 items-center gap-0 text-xl font-bold tracking-tight text-[#ff8700]'
     )
-    expect(systemBrand).toContain(
-      "className='flex size-7 items-center justify-center overflow-hidden rounded-md'"
-    )
+    expect(systemBrand).toContain("className='h-7 w-auto object-contain'")
     expect(publicHeader).toContain(
       'text-foreground nav-link-active font-semibold'
     )

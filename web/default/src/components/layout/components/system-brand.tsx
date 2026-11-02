@@ -24,9 +24,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
-import { cn } from '@/lib/utils'
+import { DEFAULT_LOGO } from '@/lib/constants'
+
+import { HeaderLogo } from './header-logo'
 
 type SystemBrandProps = {
   defaultName?: string
@@ -48,7 +51,7 @@ type SystemBrandProps = {
 export function SystemBrand(props: SystemBrandProps) {
   const { t } = useTranslation()
   const { status } = useStatus()
-  const { logo } = useSystemConfig()
+  const { systemName, logo, loading, logoLoaded } = useSystemConfig()
 
   const variant = props.variant ?? 'sidebar'
   const name = status?.system_name || props.defaultName || 'New API'
@@ -56,23 +59,31 @@ export function SystemBrand(props: SystemBrandProps) {
     status?.version || props.defaultVersion || t('Unknown version')
 
   if (variant === 'inline') {
+    let logoContent: React.ReactNode
+    if (loading) {
+      logoContent = <Skeleton className='h-7 w-auto rounded-lg' />
+    } else {
+      logoContent = (
+        <HeaderLogo
+          src={logo}
+          alt={t('Logo')}
+          loading={loading}
+          logoLoaded={logoLoaded}
+          className='h-7 w-auto object-contain'
+        />
+      )
+    }
+
     return (
       <Link
         to='/'
         aria-label={t('Go to home')}
-        className={cn(
-          'inline-flex h-7 items-center gap-0 rounded-md px-1.5 text-xl font-semibold tracking-tight transition-colors outline-none select-none text-primary',
-          'hover:text-primary focus-visible:ring-ring/40 focus-visible:ring-2'
-        )}
+        className='flex shrink-0 items-center gap-0 text-xl font-bold tracking-tight text-[#ff8700]'
       >
-        <div className='flex size-7 items-center justify-center overflow-hidden rounded-md'>
-          <img
-            src={logo}
-            alt={t('Logo')}
-            className='size-full rounded-md object-cover'
-          />
-        </div>
-        <span className='max-w-[12rem] truncate'>{name}</span>
+        {logoContent}
+        {!loading && logo && logo !== DEFAULT_LOGO && (
+          <span className='text-primary'>{systemName}</span>
+        )}
       </Link>
     )
   }

@@ -10,6 +10,8 @@
   "Discover, evaluate, route, and deliver AI models through one API.": "Discover, evaluate, route, and deliver AI models through one API.",
   "docs.apiRef.description": "We provide an OpenAI-compatible REST API and complete examples for multiple languages (HTTP, cURL, Python, Node.js).",
   "docs.apiRef.imageToVideo": "Image to Video",
+  "docs.apiRef.textToSpeech": "Text to speech",
+  "docs.apiRef.speechToText": "Speech to Text",
   "docs.faq.q1.a": "After registration, a small amount of trial credits is automatically granted. You can check your balance on the Wallet page after login. You may also contact the admin for additional test credits. Alipay online top-up is supported for purchasing credits as needed.",
   "docs.faq.q2.a": "On the API Keys page in the console, you can view your list of generated keys and create or delete them. Each key has independent billing. It is recommended to create separate keys for different applications. Please keep your keys safe and avoid leaks.",
   "docs.faq.q3.a": "We currently support major models including GPT-4o, GPT-4.1, Claude 3.5, Gemini 3.1, Llama 4, and more are being added continuously. Check the Pricing page or Rankings for the full model list with detailed specs and pricing.",

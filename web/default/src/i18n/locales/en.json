@@ -5050,6 +5050,8 @@
     "docs.apiRef.chatCompletions": "Chat Completions",
     "docs.apiRef.imageGeneration": "Image Generation",
     "docs.apiRef.imageToVideo": "Image to Video",
+    "docs.apiRef.textToSpeech": "Text to speech",
+    "docs.apiRef.speechToText": "Speech to Text",
     "docs.sdk.pythonDesc": "Official Python SDK, supporting sync and async calls.",
     "docs.sdk.nodeDesc": "JavaScript SDK for Node.js / browser environments.",
     "sdk.sdk.goDesc": "Official Go language community SDK.",
