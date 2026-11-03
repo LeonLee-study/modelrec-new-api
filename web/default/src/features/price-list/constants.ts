@@ -38,10 +38,10 @@ export const FILTER_ALL = 'all'
  * lands.
  */
 export const PLACEHOLDER_RULE_VALUES: PricingRuleValues = {
-  pr_CNY: 1000,
-  pr_USD: 7000,
+  pr_CNY: 20,
+  pr_USD: 140,
   std_USD: 2,
-  suidian_token: 71.43,
+  suidian_token: 3571,
   cost_rate: 7,
 }
 
