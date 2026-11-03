@@ -299,6 +299,7 @@ type PricingTableProps = {
   columns: AnyCols
   data: Record<string, unknown>[]
   emptyLabel: string
+  customizedCurrency: string
 }
 
 function SortIcon({ direction }: { direction: SortDirection | null }) {
@@ -315,7 +316,12 @@ function SortIcon({ direction }: { direction: SortDirection | null }) {
   )
 }
 
-function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
+function PricingTable({
+  columns,
+  data,
+  emptyLabel,
+  customizedCurrency,
+}: PricingTableProps) {
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<SortDirection | null>(null)
 
@@ -359,7 +365,10 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
                   }
                 >
                   <span className='inline-flex items-center gap-1.5'>
-                    <TableHeaderLabel k={col.headerKey} />
+                    <TableHeaderLabel
+                      k={col.headerKey}
+                      customizedCurrency={customizedCurrency}
+                    />
                     {col.sortable && (
                       <SortIcon
                         direction={
@@ -407,9 +416,15 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
 }
 
 /** Tiny helper so we can call `t()` inside the render path. */
-function TableHeaderLabel({ k }: { k: string }) {
+function TableHeaderLabel({
+  k,
+  customizedCurrency,
+}: {
+  k: string
+  customizedCurrency: string
+}) {
   const { t } = useTranslation()
-  return <>{t(k)}</>
+  return <>{t(k, { customized_currency: customizedCurrency })}</>
 }
 
 // ----------------------------------------------------------------------------
@@ -419,6 +434,7 @@ function TableHeaderLabel({ k }: { k: string }) {
 export type PriceListCategorySectionProps = {
   config: CategoryConfig
   data: Record<string, unknown>[]
+  customizedCurrency: string
 }
 
 /**
@@ -428,6 +444,7 @@ export type PriceListCategorySectionProps = {
 export function PriceListCategorySection({
   config,
   data,
+  customizedCurrency,
 }: PriceListCategorySectionProps) {
   const { t } = useTranslation()
   const columns = COLUMNS_MAP[config.key]
@@ -455,6 +472,7 @@ export function PriceListCategorySection({
         columns={columns}
         data={data}
         emptyLabel={t('priceList.table.noData')}
+        customizedCurrency={customizedCurrency}
       />
     </section>
   )

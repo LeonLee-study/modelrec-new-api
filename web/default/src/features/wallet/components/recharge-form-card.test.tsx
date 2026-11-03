@@ -124,8 +124,8 @@ beforeEach(() => {
         ...DEFAULT_CURRENCY_CONFIG,
         quotaDisplayType: 'CUSTOM',
         usdExchangeRate: 7,
-        customCurrencySymbol: '燧点',
-        customCurrencyExchangeRate: 7000,
+        customCurrencySymbol: '积分',
+        customCurrencyExchangeRate: 140,
         paymentCurrencySymbol: '¥',
       },
     },
@@ -176,7 +176,7 @@ describe('wallet recharge amount controls', () => {
 
   test('shows CNY payment, custom quota, and USD custom input units', () => {
     const presetMarkup = renderCard({ selectedPreset: 10 })
-    const quotaPosition = presetMarkup.indexOf('70,000燧点')
+    const quotaPosition = presetMarkup.indexOf('1,400积分')
     const paymentPosition = presetMarkup.indexOf('¥70')
 
     assert.notEqual(quotaPosition, -1)
@@ -192,7 +192,7 @@ describe('wallet recharge amount controls', () => {
     assert.match(customMarkup, /value="1"/)
     assert.match(
       customMarkup,
-      /data-testid="custom-amount-quota"[^>]*>= 7,000燧点<\/p>/
+      /data-testid="custom-amount-quota"[^>]*>= 140积分<\/p>/
     )
   })
 
@@ -221,7 +221,7 @@ describe('wallet recharge amount controls', () => {
     })
 
     assert.match(markup, /title="Minimum topup amount: \$50"/)
-    assert.doesNotMatch(markup, /¥350,000/)
+    assert.doesNotMatch(markup, /¥7,000/)
   })
 
   test('renders the full Alipay wordmark without duplicate visible name', () => {

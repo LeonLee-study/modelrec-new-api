@@ -32,6 +32,7 @@ import type { FilterGroupConfig } from './types'
 export function PriceList() {
   const {
     categoryData,
+    customizedCurrency,
     resultCount,
     providerOptions,
     vendorCount,
@@ -78,8 +79,9 @@ export function PriceList() {
             hasActiveFilters={hasActiveFilters}
             onClearFilters={handleClearFilters}
             categoryData={categoryData}
+            customizedCurrency={customizedCurrency}
           />
-          <PriceListNote />
+          <PriceListNote customizedCurrency={customizedCurrency} />
         </div>
       </PageTransition>
     </PublicLayout>

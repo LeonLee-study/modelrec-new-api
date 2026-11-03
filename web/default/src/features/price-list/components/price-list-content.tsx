@@ -27,6 +27,8 @@ export type PriceListContentProps = {
   onClearFilters: () => void
   /** Filtered model rows grouped by category key. */
   categoryData: Record<CategoryKey, Record<string, unknown>[]>
+  /** Custom currency symbol sourced from /api/status, injected into Suidian labels. */
+  customizedCurrency: string
 }
 
 /**
@@ -59,6 +61,7 @@ export function PriceListContent(props: PriceListContentProps) {
           key={cat.key}
           config={cat}
           data={props.categoryData[cat.key]}
+          customizedCurrency={props.customizedCurrency}
         />
       ))}
     </div>

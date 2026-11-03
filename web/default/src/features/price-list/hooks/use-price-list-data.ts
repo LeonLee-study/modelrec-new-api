@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useCallback, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getPricing } from '@/features/pricing/api'
+import { useStatus } from '@/hooks/use-status'
 import { FILTER_ALL } from '../constants'
 import {
   extractProviderOptions,
@@ -45,6 +46,9 @@ export function usePriceListData() {
     queryFn: getPricing,
     staleTime: 5 * 60 * 1000,
   })
+
+  const { status } = useStatus()
+  const customizedCurrency = status?.custom_currency_symbol?.trim() ?? ''
 
   const models = data?.data ?? []
   const vendors = data?.vendors ?? []
@@ -125,6 +129,7 @@ export function usePriceListData() {
 
   return {
     categoryData,
+    customizedCurrency,
     resultCount,
     providerOptions,
     vendorCount,
