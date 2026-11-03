@@ -221,7 +221,7 @@ describe('wallet recharge amount controls', () => {
     })
 
     assert.match(markup, /title="Minimum topup amount: \$50"/)
-    assert.doesNotMatch(markup, /¥350,000/)
+    assert.doesNotMatch(markup, /¥7,000/)
   })
 
   test('renders the full Alipay wordmark without duplicate visible name', () => {
