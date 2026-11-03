@@ -289,6 +289,8 @@ func InitResources() error {
 
 	// Initialize options, should after model.InitDB()
 	model.InitOptionMap()
+	// 模型广场 CUSTOM 额度：燧点 → 积分（展示汇率 ÷50）
+	model.MigrateLegacySuidianCurrencyOptions()
 
 	// 清理旧的磁盘缓存文件
 	common.CleanupOldCacheFiles()
