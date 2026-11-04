@@ -26,9 +26,15 @@ import { PLACEHOLDER_RULE_VALUES } from '../constants'
  * internal benchmark, and settlement formula.
  *
  * Dynamic values are sourced from PLACEHOLDER_RULE_VALUES (same as the
- * former hero cards) until a backend endpoint provides them.
+ * former hero cards) until a backend endpoint provides them. The custom
+ * currency symbol is sourced from /api/status and injected via
+ * `customized_currency`.
  */
-export function PriceListNote() {
+export function PriceListNote({
+  customizedCurrency,
+}: {
+  customizedCurrency: string
+}) {
   const { t, i18n } = useTranslation()
   const values = PLACEHOLDER_RULE_VALUES
 
@@ -51,6 +57,7 @@ export function PriceListNote() {
             pr_CNY: fmt.format(values.pr_CNY),
             pr_USD: fmt.format(values.pr_USD),
             cost_rate: fmt.format(values.cost_rate),
+            customized_currency: customizedCurrency,
           })}
         </p>
         <p className='mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400'>
@@ -60,6 +67,7 @@ export function PriceListNote() {
           {t('priceList.note.benchmark', {
             std_USD: fmt.format(values.std_USD),
             suidian_token: fmt.format(values.suidian_token),
+            customized_currency: customizedCurrency,
           })}
         </p>
         <p className='mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400'>
@@ -68,6 +76,7 @@ export function PriceListNote() {
           </span>
           {t('priceList.note.settlement', {
             pr_USD: fmt.format(values.pr_USD),
+            customized_currency: customizedCurrency,
           })}
         </p>
       </div>

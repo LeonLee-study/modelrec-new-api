@@ -18,7 +18,7 @@ type ModelCategoryRecord struct {
 	VendorName  string `json:"vendor_name,omitempty"`
 	Description string `json:"description,omitempty"`
 	Available   string `json:"available,omitempty"`
-	// Price 分类表「模型价格」原文（燧点）；同步时反解为广场 ModelRatio/ModelPrice。
+	// Price 分类表「模型价格」原文（积分；兼容历史燧点文案）；同步时反解为广场 ModelRatio/ModelPrice。
 	Price string `json:"price,omitempty"`
 }
 

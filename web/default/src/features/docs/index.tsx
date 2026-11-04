@@ -470,6 +470,25 @@ function FirstConversationSection() {
 function ApiReferenceSection() {
   const { t } = useTranslation();
 
+  const speechParams = [
+    { name: "Authorization", type: "Header", required: true, desc: "Bearer API Key" },
+    { name: "model", type: "string", required: true, desc: "模型名，如 tts-1" },
+    { name: "input", type: "string", required: true, desc: "要合成的文本" },
+    {
+      name: "voice",
+      type: "string",
+      required: true,
+      desc: "alloy / echo / fable / onyx / nova / shimmer",
+    },
+    {
+      name: "response_format",
+      type: "string",
+      required: false,
+      desc: "mp3 / opus / aac / flac / wav / pcm，默认 mp3",
+    },
+    { name: "speed", type: "number", required: false, desc: "0.25–4.0，默认 1" },
+  ];
+
   return (
     <section id="api-reference" className="scroll-mt-24">
       <AnimateInView animation="fade-up">
@@ -631,6 +650,63 @@ function ApiReferenceSection() {
 
 curl --request GET 'https://modelrec.net/v1/video/generations/task_pBKdi10NNqFCCcCl2e0Vs8wCxbIrtJZJ' \\
   --header 'Authorization: Bearer sk-xxx'`}
+            </code>
+          </pre>
+        </div>
+
+        {/* SpeechModel */}
+        <h3 className="mb-3 mt-8 text-base font-semibold tracking-tight">
+          {t("docs.apiRef.speechModel")}
+        </h3>
+        <div
+          className="mt-0 overflow-hidden rounded-lg border shadow-sm"
+          style={{
+            backgroundColor: "#1a1f2c",
+            borderColor: "rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            className="flex items-center gap-2 border-b px-4 py-2.5"
+            style={{
+              backgroundColor: "#232937",
+              borderColor: "rgba(255,255,255,0.08)",
+            }}
+          >
+            <span
+              className="rounded-md px-3 py-1 text-xs font-medium"
+              style={{
+                backgroundColor: "rgba(5,191,6,0)",
+                color: "rgb(0 188 114)",
+              }}
+            >
+              cURL
+            </span>
+            <span className="text-xs" style={{ color: "#9aa5b8" }}>
+              /v1/audio/speech
+            </span>
+          </div>
+          <pre
+            className="overflow-x-auto p-5 text-sm leading-relaxed"
+            style={{ backgroundColor: "#1a1f2c", color: "#dce3ef" }}
+          >
+            <code style={{ color: "#dce3ef" }}>
+              {`curl --request POST 'https://modelrec.net/v1/audio/speech' \
+  --header 'Authorization: Bearer sk-xxx' \\
+  --header 'Content-Type: application/json' \\
+  --data '{
+    "model": "tts-1",
+    "input": "你好，欢迎使用语音合成接口。",
+    "voice": "alloy",
+    "response_format": "mp3",
+    "speed": 1
+  }' \\
+  --output speech.mp3
+
+curl --request POST 'https://modelrec.net/v1/audio/transcriptions' \\
+  --header 'Authorization: Bearer sk-xxx' \\
+  --form 'file=@"/path/to/audio.mp3"' \\
+  --form 'model="whisper-1"' \\
+  --form 'response_format="json"'`}
             </code>
           </pre>
         </div>

@@ -87,7 +87,7 @@ const tokenCols: ColDef<TokenPricingRow>[] = [
     headerKey: 'priceList.table.inPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
+    render: (r) => sdCell(r.in_pr_SD, '积分/1M'),
     sortable: true,
     sortKey: 'in_pr_SD',
   },
@@ -96,7 +96,7 @@ const tokenCols: ColDef<TokenPricingRow>[] = [
     headerKey: 'priceList.table.outPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.out_pr_SD, '燧点/1M'),
+    render: (r) => sdCell(r.out_pr_SD, '积分/1M'),
     sortable: true,
     sortKey: 'out_pr_SD',
   },
@@ -129,7 +129,7 @@ const imageGenCols: ColDef<UnitPricingRow>[] = [
     headerKey: 'priceList.table.pcPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.unit_pr_SD, '燧点/张'),
+    render: (r) => sdCell(r.unit_pr_SD, '积分/张'),
     sortable: true,
     sortKey: 'unit_pr_SD',
   },
@@ -153,7 +153,7 @@ const videoGenCols: ColDef<UnitPricingRow>[] = [
     headerKey: 'priceList.table.sPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.unit_pr_SD, '燧点'),
+    render: (r) => sdCell(r.unit_pr_SD, '积分'),
     sortable: true,
     sortKey: 'unit_pr_SD',
   },
@@ -177,7 +177,7 @@ const unitPerSecondCols: ColDef<UnitPricingRow>[] = [
     headerKey: 'priceList.table.sPrSuidian',
     headerClassName: 'w-[30%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.unit_pr_SD, '燧点/s'),
+    render: (r) => sdCell(r.unit_pr_SD, '积分/s'),
     sortable: true,
     sortKey: 'unit_pr_SD',
   },
@@ -201,7 +201,7 @@ const worldModelCols: ColDef<WorldModelRow>[] = [
     headerKey: 'priceList.table.tInPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.t_in_pr_SD, '燧点/次'),
+    render: (r) => sdCell(r.t_in_pr_SD, '积分/次'),
     sortable: true,
     sortKey: 't_in_pr_SD',
   },
@@ -210,7 +210,7 @@ const worldModelCols: ColDef<WorldModelRow>[] = [
     headerKey: 'priceList.table.sOutPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.s_out_pr_SD, '燧点/s'),
+    render: (r) => sdCell(r.s_out_pr_SD, '积分/s'),
     sortable: true,
     sortKey: 's_out_pr_SD',
   },
@@ -243,7 +243,7 @@ const vectorCols: ColDef<VectorRow>[] = [
     headerKey: 'priceList.table.textInPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.in_pr_SD, '燧点/1M'),
+    render: (r) => sdCell(r.in_pr_SD, '积分/1M'),
     sortable: true,
     sortKey: 'in_pr_SD',
   },
@@ -252,7 +252,7 @@ const vectorCols: ColDef<VectorRow>[] = [
     headerKey: 'priceList.table.vecInPrSuidian',
     headerClassName: 'w-[15.25%] min-w-[132px]',
     cellClassName: SD_CELL_CLASS,
-    render: (r) => sdCell(r.vec_in_pr_SD, '燧点/1M'),
+    render: (r) => sdCell(r.vec_in_pr_SD, '积分/1M'),
     sortable: true,
     sortKey: 'vec_in_pr_SD',
   },
@@ -299,6 +299,7 @@ type PricingTableProps = {
   columns: AnyCols
   data: Record<string, unknown>[]
   emptyLabel: string
+  customizedCurrency: string
 }
 
 function SortIcon({ direction }: { direction: SortDirection | null }) {
@@ -315,7 +316,12 @@ function SortIcon({ direction }: { direction: SortDirection | null }) {
   )
 }
 
-function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
+function PricingTable({
+  columns,
+  data,
+  emptyLabel,
+  customizedCurrency,
+}: PricingTableProps) {
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<SortDirection | null>(null)
 
@@ -359,7 +365,10 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
                   }
                 >
                   <span className='inline-flex items-center gap-1.5'>
-                    <TableHeaderLabel k={col.headerKey} />
+                    <TableHeaderLabel
+                      k={col.headerKey}
+                      customizedCurrency={customizedCurrency}
+                    />
                     {col.sortable && (
                       <SortIcon
                         direction={
@@ -407,9 +416,15 @@ function PricingTable({ columns, data, emptyLabel }: PricingTableProps) {
 }
 
 /** Tiny helper so we can call `t()` inside the render path. */
-function TableHeaderLabel({ k }: { k: string }) {
+function TableHeaderLabel({
+  k,
+  customizedCurrency,
+}: {
+  k: string
+  customizedCurrency: string
+}) {
   const { t } = useTranslation()
-  return <>{t(k)}</>
+  return <>{t(k, { customized_currency: customizedCurrency })}</>
 }
 
 // ----------------------------------------------------------------------------
@@ -419,6 +434,7 @@ function TableHeaderLabel({ k }: { k: string }) {
 export type PriceListCategorySectionProps = {
   config: CategoryConfig
   data: Record<string, unknown>[]
+  customizedCurrency: string
 }
 
 /**
@@ -428,6 +444,7 @@ export type PriceListCategorySectionProps = {
 export function PriceListCategorySection({
   config,
   data,
+  customizedCurrency,
 }: PriceListCategorySectionProps) {
   const { t } = useTranslation()
   const columns = COLUMNS_MAP[config.key]
@@ -455,6 +472,7 @@ export function PriceListCategorySection({
         columns={columns}
         data={data}
         emptyLabel={t('priceList.table.noData')}
+        customizedCurrency={customizedCurrency}
       />
     </section>
   )

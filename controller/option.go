@@ -359,6 +359,17 @@ func UpdateOption(c *gin.Context) {
 			})
 			return
 		}
+	case model.OptionKeyModelAliasMap:
+		if err = model.ValidateModelAliasMapJSON(option.Value.(string)); err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+		if strings.TrimSpace(option.Value.(string)) == "" {
+			option.Value = "{}"
+		}
 	}
 	err = model.UpdateOption(option.Key, option.Value.(string))
 	if err != nil {

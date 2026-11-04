@@ -24,8 +24,10 @@ import {
   Settings,
   Shield,
   ShieldAlert,
+  Shuffle,
   Wrench,
 } from 'lucide-react'
+import { getAliasMappingSectionNavItems } from '@/features/system-settings/alias-mapping/section-registry.tsx'
 import { getAuthSectionNavItems } from '@/features/system-settings/auth/section-registry.tsx'
 import { getBillingSectionNavItems } from '@/features/system-settings/billing/section-registry.tsx'
 import { getContentSectionNavItems } from '@/features/system-settings/content/section-registry.tsx'
@@ -77,6 +79,11 @@ function getSystemSettingsNavGroups(t: TFunction): NavGroup[] {
           title: t('Console Content'),
           icon: Layout,
           items: getContentSectionNavItems(t),
+        },
+        {
+          title: t('Alias Mapping'),
+          icon: Shuffle,
+          items: getAliasMappingSectionNavItems(t),
         },
         {
           title: t('Operations'),

@@ -56,15 +56,15 @@ afterEach(() => {
 describe('wallet currency presentation', () => {
   test('separates the USD top-up, CNY payment, and custom quota units', () => {
     setCurrency('CUSTOM', {
-      customCurrencySymbol: '燧点',
-      customCurrencyExchangeRate: 7000,
+      customCurrencySymbol: '积分',
+      customCurrencyExchangeRate: 140,
       usdExchangeRate: 7,
       paymentCurrencySymbol: '¥',
     })
     const currency = useSystemConfigStore.getState().config.currency
 
     assert.equal(formatWalletTopupAmount(10), '$10')
-    assert.equal(formatWalletQuotaAmount(10, currency), '70,000燧点')
+    assert.equal(formatWalletQuotaAmount(10, currency), '1,400积分')
     assert.equal(formatWalletPaymentAmount(70, '¥'), '¥70')
     assert.equal(getWalletCurrencySymbol(), '$')
   })

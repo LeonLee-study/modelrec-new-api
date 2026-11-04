@@ -77,6 +77,7 @@ func GetUserQuotaDates(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
+	dates = model.RewriteAndMergeQuotaData(dates, model.GetUserModelAliasMapping(userId))
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
@@ -122,6 +123,7 @@ func GetUserFlowQuotaDates(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
+	dates = model.RewriteAndMergeFlowQuotaData(dates, model.GetUserModelAliasMapping(userId))
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",

@@ -11,7 +11,8 @@ export default defineConfig(({ envMode }) => {
   const serverUrl =
     process.env.VITE_REACT_APP_SERVER_URL ||
     env.rawPublicVars.VITE_REACT_APP_SERVER_URL ||
-    "http://localhost:3000";
+    "http://localhost:3000"; // 默认后端地址 — 暂时注释
+    //"http://172.16.30.177:3000"; // 临时使用的后端地址
 
   //  新增：SMS 服务地址
   const smsServiceUrl =
@@ -19,8 +20,8 @@ export default defineConfig(({ envMode }) => {
 
   const isProd = envMode === "production";
   const devProxy = {
-    // TODO: temporary — route pricing to remote test server (avoids CORS)
-    "/api/pricing": { target: "http://47.121.128.119", changeOrigin: true },
+    // TODO: test proxy disabled — /api/pricing now routes to local backend via generic /api rule below
+    // "/api/pricing": { target: "http://47.121.128.119", changeOrigin: true },
     "/api/v2": { target: smsServiceUrl, changeOrigin: true },
     ...Object.fromEntries(
       (["/api", "/mj", "/pg"] as const).map((key) => [

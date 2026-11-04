@@ -41,14 +41,22 @@ func TestResolvePricingKind(t *testing.T) {
 	}
 }
 
+func TestPointsPerUSDAnchor(t *testing.T) {
+	t.Parallel()
+	assert.InDelta(t, 20.0, PointsPerCNY, 1e-9)
+	assert.InDelta(t, 7.0, PricingAnchorCNYPerUSD, 1e-9)
+	assert.InDelta(t, 140.0, PointsPerUSD, 1e-9)
+	assert.InDelta(t, PointsPerUSD, SuidianMultiplier, 1e-9)
+}
+
 func TestOfficialTokenPriceAndSuidian(t *testing.T) {
 	t.Parallel()
 
 	inputUSD, outputUSD := OfficialTokenPriceUSD(1.0, 4.0)
 	assert.InDelta(t, 2.0, inputUSD, 1e-9)
 	assert.InDelta(t, 8.0, outputUSD, 1e-9)
-	assert.InDelta(t, 14000.0, ToSuidianPrice(inputUSD), 1e-9)
-	assert.InDelta(t, 56000.0, ToSuidianPrice(outputUSD), 1e-9)
+	assert.InDelta(t, 280.0, ToSuidianPrice(inputUSD), 1e-9)
+	assert.InDelta(t, 1120.0, ToSuidianPrice(outputUSD), 1e-9)
 }
 
 func TestApplyOfficialPricingFieldsText(t *testing.T) {
@@ -69,8 +77,8 @@ func TestApplyOfficialPricingFieldsText(t *testing.T) {
 	require.NotNil(t, p.SuidianOutputPer1M)
 	assert.InDelta(t, 1.0, *p.OfficialInputPriceUSD, 1e-9)
 	assert.InDelta(t, 2.0, *p.OfficialOutputPriceUSD, 1e-9)
-	assert.InDelta(t, 7000.0, *p.SuidianInputPer1M, 1e-9)
-	assert.InDelta(t, 14000.0, *p.SuidianOutputPer1M, 1e-9)
+	assert.InDelta(t, 140.0, *p.SuidianInputPer1M, 1e-9)
+	assert.InDelta(t, 280.0, *p.SuidianOutputPer1M, 1e-9)
 	assert.Nil(t, p.OfficialUnitPriceUSD)
 }
 
@@ -89,7 +97,7 @@ func TestApplyOfficialPricingFieldsImageGenerate(t *testing.T) {
 	require.NotNil(t, p.OfficialUnitPriceUSD)
 	require.NotNil(t, p.SuidianUnitPrice)
 	assert.InDelta(t, 0.04, *p.OfficialUnitPriceUSD, 1e-9)
-	assert.InDelta(t, 280.0, *p.SuidianUnitPrice, 1e-9)
+	assert.InDelta(t, 6.0, *p.SuidianUnitPrice, 1e-9) // Round(0.04*140)=6
 	assert.Nil(t, p.OfficialInputPriceUSD)
 }
 
@@ -105,7 +113,7 @@ func TestApplyOfficialPricingFieldsImageRecognize(t *testing.T) {
 	ApplyOfficialPricingFields(&p)
 	require.Equal(t, PricingKindImageRecognize, p.PricingKind)
 	require.NotNil(t, p.OfficialUnitPriceUSD)
-	assert.InDelta(t, 140.0, *p.SuidianUnitPrice, 1e-9)
+	assert.InDelta(t, 3.0, *p.SuidianUnitPrice, 1e-9) // Round(0.02*140)=3
 }
 
 func TestApplyOfficialPricingFieldsWorld(t *testing.T) {
@@ -121,7 +129,7 @@ func TestApplyOfficialPricingFieldsWorld(t *testing.T) {
 	require.NotNil(t, p.OfficialInputPerCallUSD)
 	require.NotNil(t, p.SuidianInputPerCall)
 	assert.InDelta(t, 0.1, *p.OfficialInputPerCallUSD, 1e-9)
-	assert.InDelta(t, 700.0, *p.SuidianInputPerCall, 1e-9)
+	assert.InDelta(t, 14.0, *p.SuidianInputPerCall, 1e-9)
 	assert.Nil(t, p.OfficialOutputPerSecondUSD)
 }
 
@@ -138,6 +146,6 @@ func TestApplyOfficialPricingFieldsVector(t *testing.T) {
 	require.NotNil(t, p.OfficialTextInputPriceUSD)
 	require.NotNil(t, p.SuidianTextInputPer1M)
 	assert.InDelta(t, 1.0, *p.OfficialTextInputPriceUSD, 1e-9)
-	assert.InDelta(t, 7000.0, *p.SuidianTextInputPer1M, 1e-9)
+	assert.InDelta(t, 140.0, *p.SuidianTextInputPer1M, 1e-9)
 	assert.Nil(t, p.OfficialVectorInputPriceUSD)
 }

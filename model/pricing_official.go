@@ -5,10 +5,17 @@ import (
 	"strings"
 )
 
-// 与定价页抬头规则一致：基准价 $2/1M Token；燧点价 = 官方价 × 7000
+// 与定价页抬头规则一致：基准价 $2/1M Token；
+// 积分价 = 官方价(USD) × PointsPerUSD。
+// 记账口径：1 元 = 20 积分；定价锚点汇率 1 USD = 7 元 → 1 USD = 140 积分。
+// （历史口径为 1 元 = 1000 燧点 / 1 USD = 7000 燧点。）
 const (
 	OfficialPriceBenchmarkUSD = 2.0
-	SuidianMultiplier         = 7000.0
+	PointsPerCNY              = 20.0
+	PricingAnchorCNYPerUSD    = 7.0
+	PointsPerUSD              = PointsPerCNY * PricingAnchorCNYPerUSD // 140
+	// SuidianMultiplier 为历史命名，数值等于 PointsPerUSD；JSON 字段仍用 suidian_* 兼容前端。
+	SuidianMultiplier = PointsPerUSD
 )
 
 // 列表按类型返回不同价格字段（2026-10-16 前端最新 10 类）
@@ -124,7 +131,7 @@ func OfficialTokenPriceUSD(modelRatio, completionRatio float64) (inputUSD, outpu
 }
 
 func ToSuidianPrice(officialUSD float64) float64 {
-	// 分类表燧点价为整数；四舍五入避免 63/7000×7000 浮点尾巴
+	// 分类表积分为整数；四舍五入避免 1.26×140 一类浮点尾巴
 	return math.Round(officialUSD * SuidianMultiplier)
 }
 
@@ -146,7 +153,7 @@ func applyTokenInOutPrices(p *Pricing) {
 	p.SuidianOutputPer1M = floatPtr(ToSuidianPrice(outputUSD))
 }
 
-// ApplyOfficialPricingFields 按类型写入官方价与燧点价（合表字段）。
+// ApplyOfficialPricingFields 按类型写入官方价与积分价（合表字段；JSON 键仍为 suidian_*）。
 func ApplyOfficialPricingFields(p *Pricing) {
 	if p == nil {
 		return
@@ -156,11 +163,11 @@ func ApplyOfficialPricingFields(p *Pricing) {
 
 	switch kind {
 	case PricingKindImageGenerate, PricingKindVideoGenerate:
-		// 图片/视频生成：分类表多为「燧点 / 请求」→ ModelPrice
+		// 图片/视频生成：分类表多为「积分 / 请求」→ ModelPrice
 		applyUnitPriceFromModelPrice(p)
 	case PricingKindImageRecognize, PricingKindVideoRecognize,
 		PricingKindSpeechSynthesis, PricingKindSpeechRecognize:
-		// 识别/语音：分类表常为 Token 入出价；有固定价用单价，否则回填 Token 官方/燧点价
+		// 识别/语音：分类表常为 Token 入出价；有固定价用单价，否则回填 Token 官方/积分价
 		if p.QuotaType == 1 && p.ModelPrice > 0 {
 			applyUnitPriceFromModelPrice(p)
 		} else {

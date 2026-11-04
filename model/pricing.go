@@ -3,8 +3,8 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
-
 	"sync"
 	"time"
 
@@ -38,7 +38,7 @@ type Pricing struct {
 	BillingExpr            string                  `json:"billing_expr,omitempty"`
 	PricingVersion         string                  `json:"pricing_version,omitempty"`
 
-	// LG-02：类别 + 官方价/燧点价合表字段（按 pricing_kind 填充）
+	// LG-02：类别 + 官方价/积分价合表字段（按 pricing_kind 填充；JSON 键仍为 suidian_*）
 	CategoryL1             string   `json:"category_l1,omitempty"`
 	CategoryL2             string   `json:"category_l2,omitempty"`
 	PricingKind            string   `json:"pricing_kind,omitempty"`
@@ -118,6 +118,30 @@ func GetVendors() []PricingVendor {
 		GetPricing()
 	}
 	return vendorsList
+}
+
+// GetPlazaHomeStats 返回首页用的模型广场同源统计：启用模型数、有厂商的去重提供者数。
+func GetPlazaHomeStats() (modelCount int, providerCount int) {
+	pricing := GetPricing()
+	modelCount = len(pricing)
+	vendors := make(map[int]struct{}, len(pricing))
+	for _, item := range pricing {
+		if item.VendorID > 0 {
+			vendors[item.VendorID] = struct{}{}
+		}
+	}
+	return modelCount, len(vendors)
+}
+
+// FormatHomeStatCount 首页模型/提供者展示：小于等于 10 显示原值；大于 10 向下取整十并加 "+"。
+func FormatHomeStatCount(n int) string {
+	if n < 0 {
+		n = 0
+	}
+	if n <= 10 {
+		return strconv.Itoa(n)
+	}
+	return strconv.Itoa((n/10)*10) + "+"
 }
 
 func GetModelSupportEndpointTypes(model string) []constant.EndpointType {

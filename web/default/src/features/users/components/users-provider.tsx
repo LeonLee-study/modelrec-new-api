@@ -18,7 +18,9 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog'
+import { useSystemOptions } from '@/features/system-settings/hooks/use-system-options'
 import { type User, type UsersDialogType } from '../types'
+import { extractModelAliasMapKeys } from '../lib'
 
 type UsersContextType = {
   open: UsersDialogType | null
@@ -27,6 +29,7 @@ type UsersContextType = {
   setCurrentRow: React.Dispatch<React.SetStateAction<User | null>>
   refreshTrigger: number
   triggerRefresh: () => void
+  aliasMap: string[]
 }
 
 const UsersContext = React.createContext<UsersContextType | null>(null)
@@ -38,6 +41,9 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
 
   const triggerRefresh = () => setRefreshTrigger((prev) => prev + 1)
 
+  const { data: systemOptionsData } = useSystemOptions()
+  const aliasMap = extractModelAliasMapKeys(systemOptionsData?.data)
+
   return (
     <UsersContext
       value={{
@@ -47,6 +53,7 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
         setCurrentRow,
         refreshTrigger,
         triggerRefresh,
+        aliasMap,
       }}
     >
       {children}

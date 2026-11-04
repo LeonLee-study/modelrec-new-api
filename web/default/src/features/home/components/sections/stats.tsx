@@ -18,20 +18,45 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
 
-const HOME_STATS = [
-  { value: '400+', label: 'Models', accent: true },
-  { value: '60+', label: 'Providers', accent: false },
-  // TODO: Restore after these values are backed by verified production data.
-  // { value: '8M+', label: 'Global Users', accent: false },
-  // { value: '100T', label: 'Monthly Tokens', accent: true },
-] as const
+import { useStatus } from '@/hooks/use-status'
+
+interface Stat {
+  value: string
+  label: string
+  accent: boolean
+}
+
+function toCountDisplay(count: unknown, fallback: string): string {
+  if (typeof count !== 'number' && typeof count !== 'string') return fallback
+  const n = Math.trunc(Number(count))
+  if (!Number.isFinite(n) || n < 0) return fallback
+  if (n > 10) return  `${Math.floor(n / 10) * 10}+`
+  return String(n)
+}
 
 export function Stats() {
   const { t } = useTranslation()
+  const { status } = useStatus()
+
+  const stats: Stat[] = [
+    {
+      value: toCountDisplay(status?.home_model_count, '400+'),
+      label: 'Models',
+      accent: true,
+    },
+    {
+      value: toCountDisplay(status?.home_provider_count, '60+'),
+      label: 'Providers',
+      accent: false,
+    },
+    // TODO: Restore after these values are backed by verified production data.
+    // { value: '8M+', label: 'Global Users', accent: false },
+    // { value: '100T', label: 'Monthly Tokens', accent: true },
+  ]
 
   return (
     <dl className='mt-12 grid max-w-3xl grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-4'>
-      {HOME_STATS.map((stat) => (
+      {stats.map((stat) => (
         <div key={stat.label}>
           <dd
             className={
