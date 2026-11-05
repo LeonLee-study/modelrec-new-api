@@ -16,11 +16,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Plus, Edit, Trash2, Save, Eye, Minus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ComboboxInput } from '@/components/ui/combobox-input'
 import {
   Form,
   FormControl,
@@ -44,6 +46,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { StaticDataTable } from '@/components/data-table'
 import { Dialog } from '@/components/dialog'
+import { getPricing } from '@/features/pricing/api'
 // import { SettingsSwitchField } from '../components/settings-form-layout' /* Enabled toggle hidden — kept for restoration */
 import { SettingsSection } from '../components/settings-section'
 import { useUpdateOption } from '../hooks/use-update-option'
@@ -135,6 +138,25 @@ export function AliasMappingSection({
   )
 
   const [pairs, setPairs] = useState<MappingPair[]>([])
+
+  const { data: pricingData } = useQuery({
+    queryKey: ['pricing'],
+    queryFn: getPricing,
+    enabled: showFormDialog,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const originalNameOptions = useMemo(() => {
+    const modelNames = pricingData?.data?.map((model) => model.model_name) ?? []
+    const uniqueModelNames = [...new Set(modelNames)]
+    return [
+      { value: '', label: t('Not Set') },
+      ...uniqueModelNames.map((name) => ({
+        value: name,
+        label: name,
+      })),
+    ]
+  }, [pricingData, t])
 
   const form = useForm<FormValues>({ defaultValues: { label: '' } })
 
@@ -543,14 +565,17 @@ export function AliasMappingSection({
                       key={idx}
                       className='flex items-center gap-2'
                     >
-                      <Input
-                        value={original}
-                        onChange={(e) =>
-                          updatePairValue(idx, 0, e.target.value)
-                        }
-                        placeholder={t('Original Name')}
-                        className='flex-1'
-                      />
+                      <div className='flex-1'>
+                        <ComboboxInput
+                          value={original}
+                          onValueChange={(value) =>
+                            updatePairValue(idx, 0, value)
+                          }
+                          options={originalNameOptions}
+                          placeholder={t('Original Name')}
+                          emptyText={t('No matching items')}
+                        />
+                      </div>
                       <span className='text-muted-foreground'>→</span>
                       <Input
                         value={alias}
